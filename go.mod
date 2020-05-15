@@ -29,8 +29,11 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-ini/ini v1.55.0
+	github.com/gomodule/redigo/redis v0.0.0-20200429221454-e14091dffc1b
 	github.com/google/uuid v1.1.1
 	github.com/jinzhu/gorm v1.9.12
+	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.5
+	gopkg.in/ini.v1 v1.56.0 // indirect
 )

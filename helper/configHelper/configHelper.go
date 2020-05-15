@@ -24,6 +24,12 @@ var (
 	ImageDir           string
 	MaxIdleConns       string
 	MaxOpenConns       string
+	DBRedisHost        string
+	DBRedisPassword    string
+	DBRedisDb          string
+	DBRedisMaxActive   string
+	DBRedisMaxIdle     string
+	DBRedisIdleTimeout string
 )
 
 // 初始化配置信息
@@ -38,6 +44,7 @@ func init() {
 	LoadServer()
 	LoadApp()
 	LoadMysql()
+	LoadRedis()
 }
 
 func LoadBase() {
@@ -76,6 +83,19 @@ func LoadMysql() {
 	DBMysqlPassword = sec.Key("PASSWORD").MustString("")
 	DBMysqlHost = sec.Key("HOST").MustString("127.0.0.1:3306")
 	DBMysqlTablePrefix = sec.Key("TABLE_PREFIX").MustString("")
-	MaxIdleConns = sec.Key("MAXIDLECONNS").MustString("")
-	MaxOpenConns = sec.Key("MAXOPENCONNS").MustString("")
+	MaxIdleConns = sec.Key("MAXIDLECONNS").MustString("20")
+	MaxOpenConns = sec.Key("MAXOPENCONNS").MustString("20")
+}
+
+func LoadRedis() {
+	sec, err := Cfg.GetSection("redis")
+	if err != nil {
+		log.Fatalf("Fail to get section 'redis': %v", err)
+	}
+	DBRedisHost = sec.Key("HOST").MustString("127.0.0.1:3306")
+	DBRedisPassword = sec.Key("PASSWORD").MustString("")
+	DBRedisDb = sec.Key("DB").MustString("0")
+	DBRedisMaxActive = sec.Key("MAXACTIVE").MustString("20")
+	DBRedisMaxIdle = sec.Key("MAXIDLE").MustString("")
+	DBRedisIdleTimeout = sec.Key("IDLETIMEOUT").MustString("0")
 }
