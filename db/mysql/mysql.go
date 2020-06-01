@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/Biubiubiuuuu/orderingSystem/helper/configHelper"
-	"github.com/Biubiubiuuuu/orderingSystem/model/adminModel"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -72,12 +71,4 @@ func SetDBConns(db *gorm.DB) {
 // 获取mysql连接池
 func GetMysqlDB() *gorm.DB {
 	return InitMysqlDB()
-}
-
-// 初始化mysql数据库并自动迁移模型
-func InitMysql() {
-	DB.InitCoon()
-	db := GetMysqlDB()
-	// 自动迁移模型
-	db.AutoMigrate(&adminModel.Admin{})
 }
