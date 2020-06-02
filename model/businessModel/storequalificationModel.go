@@ -5,7 +5,7 @@ import (
 	"github.com/Biubiubiuuuu/orderingSystem/model"
 )
 
-// 资质信息
+// StoreQualificationInfo model 资质信息
 type StoreQualificationInfo struct {
 	model.Model
 	StoreCertificationStatus int64                 `json:"store_certification_status"` // 店铺认证状态  0：已认证 | 1：未认证
@@ -14,30 +14,31 @@ type StoreQualificationInfo struct {
 	SubjectQualificationID   int64                 `json:"-"`                          // 主体资质ID
 	IndustryQualification    IndustryQualification `json:"industry_qualification"`     // 行业资质
 	IndustryQualificationID  int64                 `json:"-"`                          // 行业资质ID
-	StoreID                  int64                 `gorm:"INDEX" json:"store_id"`      // 门店ID
+	AdminID                  int64                 `gorm:"INDEX" json:"admin_id"`      // 商家管理员ID
 }
 
-// 主体资质
+// SubjectQualification model 主体资质
 type SubjectQualification struct {
 	ID               int64
 	CertificateType  string `json:"certificate_type"`  // 证书类型
 	CertificatePhoto string `json:"certificate_photo"` // 证书照片
 }
 
-// 行业资质
+// IndustryQualification model 行业资质
 type IndustryQualification struct {
 	ID               int64
 	CertificateType  string `json:"certificate_type"`  // 证书类型
 	CertificatePhoto string `json:"certificate_photo"` // 证书照片
 }
 
-// 开店个人信息
+// StoreOpeningPersonalInfo model 开店个人信息
 type StoreOpeningPersonalInfo struct {
 	ID                int64
 	CertificateType   string             `json:"certificate_type"`                                                // 证书类型
 	CertificatePhotos []CertificatePhoto `gorm:"foreignkey:StoreOpeningPersonalInfoID;association_foreignkey:ID"` // 身份证照
 }
 
+// CertificatePhoto model 身份证照
 type CertificatePhoto struct {
 	ID                         int64
 	Url                        string `json:"Url"`                                         // 图片保存地址

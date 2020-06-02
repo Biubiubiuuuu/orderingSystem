@@ -5,7 +5,7 @@ import (
 	"github.com/Biubiubiuuuu/orderingSystem/model"
 )
 
-// 门店信息
+// Store model 门店信息
 type Store struct {
 	model.Model
 	StoreName              string         `gorm:"size:30;not null" json:"store_name"`                // 门店名称
