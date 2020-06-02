@@ -1,12 +1,295 @@
-basePath: '{{.BasePath}}'
-host: '{{.Host}}'
+definitions:
+  entity.DeleteIds:
+    properties:
+      ids:
+        description: ids
+        items:
+          type: integer
+        type: array
+    type: object
+  entity.ResponseData:
+    properties:
+      data:
+        additionalProperties: true
+        description: 返回数据
+        type: object
+      message:
+        description: 提示信息
+        type: string
+      status:
+        description: 成功失败标志；true：成功 、false：失败
+        type: boolean
+    type: object
+  entity.SystemAdminLoginRequest:
+    properties:
+      password:
+        description: 密码
+        type: string
+      username:
+        description: 用户名
+        type: string
+    type: object
+  entity.SystemAdminUpdatePassRequest:
+    properties:
+      new_password:
+        description: 新密码
+        type: string
+      old_password:
+        description: 旧密码
+        type: string
+    type: object
 info:
   contact: {}
-  description: '{{.Description}}'
   license: {}
-  title: '{{.Title}}'
-  version: '{{.Version}}'
-paths: {}
+paths:
+  /api/v1/admin/deleteAdmin:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除管理员
+      tags:
+      - 系统管理员
+  /api/v1/admin/deleteAdmins:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.DeleteIds'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 批量删除管理员
+      tags:
+      - 系统管理员
+  /api/v1/systemadmin/add:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 用户名
+        in: formData
+        name: username
+        required: true
+        type: string
+      - description: 密码
+        in: formData
+        name: password
+        required: true
+        type: string
+      - description: 操作权限 Y | N
+        in: formData
+        name: manager
+        type: string
+      - description: 用户头像
+        in: formData
+        name: avatar
+        type: file
+      - description: 是否启用
+        in: formData
+        name: is_enable
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 添加管理员
+      tags:
+      - 系统管理员
+  /api/v1/systemadmin/isEnableAdmin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 启用/禁用管理员
+        in: query
+        name: is_enable
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 启用/禁用管理员
+      tags:
+      - 系统管理员
+  /api/v1/systemadmin/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SystemAdminLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      summary: 管理员登录
+      tags:
+      - 系统管理员
+  /api/v1/systemadmin/queryAdmin:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询管理员
+      tags:
+      - 系统管理员
+  /api/v1/systemadmin/queryAdmins:
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - description: 用户名
+        in: query
+        name: username
+        type: string
+      - description: 创建开始时间
+        in: query
+        name: created_at_start
+        type: string
+      - description: 创建结束时间
+        in: query
+        name: created_at_end
+        type: string
+      - description: 操作权限
+        in: query
+        name: manager
+        type: string
+      - description: 创建人
+        in: query
+        name: created_by
+        type: string
+      - description: 是否启用
+        in: query
+        name: is_enable
+        type: string
+      - description: 页大小
+        in: query
+        name: pageSize
+        type: string
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 分页查询管理员(默认前100条) 并返回总记录数
+      tags:
+      - 系统管理员
+  /api/v1/systemadmin/updateAdmin:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 用户名
+        in: formData
+        name: username
+        type: string
+      - description: 操作权限 Y | N
+        in: formData
+        name: manager
+        type: string
+      - description: 用户头像
+        in: formData
+        name: avatar
+        type: file
+      - description: 是否启用
+        in: formData
+        name: is_enable
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改管理员
+      tags:
+      - 系统管理员
+  /api/v1/systemadmin/updatePass:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SystemAdminUpdatePassRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改管理员密码
+      tags:
+      - 系统管理员
 securityDefinitions:
   ApiKeyAuth:
     in: header

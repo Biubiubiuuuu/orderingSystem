@@ -4,6 +4,7 @@ import (
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
 	"github.com/Biubiubiuuuu/orderingSystem/db/redis"
 	"github.com/Biubiubiuuuu/orderingSystem/helper/configHelper"
+	"github.com/Biubiubiuuuu/orderingSystem/helper/encryptHelper"
 	"github.com/Biubiubiuuuu/orderingSystem/model/businessModel"
 	"github.com/Biubiubiuuuu/orderingSystem/model/systemModel"
 	"github.com/Biubiubiuuuu/orderingSystem/router"
@@ -17,7 +18,12 @@ func main() {
 	mysql.DB.InitCoon()
 	db := mysql.GetMysqlDB()
 	//自动迁移模型
-	db.AutoMigrate(&systemModel.Admin{}, &businessModel.Admin{})
+	db.AutoMigrate(&systemModel.SystemAdmin{}, &businessModel.BusinessAdmin{})
+	// 添加默认管理员 username:Admin,password:123456
+	a := systemModel.SystemAdmin{Username: "admin", Password: encryptHelper.EncryptMD5To32Bit("123456"), Manager: "Y"}
+	if err := a.QuerySystemAdmin(); err != nil {
+		a.AddSystemAdmin()
+	}
 	//初始化redis
 	redis.InitRedis()
 	//初始化路由

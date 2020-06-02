@@ -1,11 +1,14 @@
 package router
 
 import (
+	"github.com/Biubiubiuuuu/orderingSystem/controller/systemController"
 	"github.com/Biubiubiuuuu/orderingSystem/docs"
 	"github.com/Biubiubiuuuu/orderingSystem/helper/configHelper"
 	"github.com/Biubiubiuuuu/orderingSystem/middleware/crossMiddleware"
 	"github.com/Biubiubiuuuu/orderingSystem/middleware/errorMiddleware"
+	"github.com/Biubiubiuuuu/orderingSystem/middleware/jwtMiddleware"
 	"github.com/Biubiubiuuuu/orderingSystem/middleware/loggerMiddleware"
+	"github.com/Biubiubiuuuu/orderingSystem/middleware/systemMiddleware"
 	"github.com/gin-gonic/gin"
 	ginswagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -31,10 +34,33 @@ func Init() *gin.Engine {
 	router.Use(crossMiddleware.Cors())
 
 	// 自定义router
-
+	InitSystemAdmin(router)
 	//gin swaager
 	router.GET("/swagger/*any", ginswagger.WrapHandler(swaggerFiles.Handler))
 	//404
 	router.NoRoute(errorMiddleware.NotFound)
 	return router
+}
+
+// 系统管理员
+func InitSystemAdmin(router *gin.Engine) {
+	// 路由分组
+	api := router.Group("/api/v1/systemadmin")
+	// get post update delete...
+	api.POST("login", systemController.Login)
+	api.Use(jwtMiddleware.JWT())
+	{
+		api.POST("updatePass", systemController.UpdatePass)
+		api.GET("queryAdmins", systemController.QueryAdmins)
+		api.GET("queryAdmin", systemController.QueryAdmin)
+		api.POST("updateAdmin", systemController.UpdateAdmin)
+		// 需要管理权限manager为Y才能操作
+		api.Use(systemMiddleware.AdminAuth())
+		{
+			api.POST("addAdmin", systemController.AddAdmin)
+			api.POST("isEnableAdmin", systemController.IsEnableAdmin)
+			api.POST("deleteAdmins", systemController.DeleteAdmins)
+			api.DELETE("deleteAdmin", systemController.DeleteAdmin)
+		}
+	}
 }

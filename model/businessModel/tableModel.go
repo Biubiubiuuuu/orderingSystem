@@ -28,7 +28,7 @@ func (t *TableSeat) AddTableSeat() error {
 // 修改餐桌
 func (t *TableSeat) UpdateTableSeat(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&t).Update(args).Error
+	return db.Model(&t).Updates(args).Error
 }
 
 // 查询餐桌

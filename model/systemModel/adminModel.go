@@ -2,57 +2,52 @@ package systemModel
 
 import (
 	"errors"
+	"time"
 
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
 	"github.com/Biubiubiuuuu/orderingSystem/model"
 	"github.com/google/uuid"
 )
 
-// Admin model 系统管理员
-type Admin struct {
+// SystemAdmin model 系统管理员
+type SystemAdmin struct {
 	model.Model
-	Username string    `gorm:"not null;unique;size:10" json:"username"`    // 管理员
-	Password string    `gorm:"not null;size:30" json:"-"`                  // 密码
-	IP       string    `gorm:"size:30" json:"ip"`                          // 登录IP
-	Token    string    `gorm:"size:30" json:"token"`                       // 授权令牌
-	Manager  string    `gorm:"not null;default:'N';size:1" json:"manager"` // 操作权限 Y | N
-	Avatar   string    `gorm:"size:10" json:"avatar"`                      // 头像
-	UUID     uuid.UUID `json:"uuid"`
+	Username  string    `gorm:"not null;unique;" json:"username"`           // 用户名
+	Password  string    `gorm:"not null;" json:"-"`                         // 密码
+	IP        string    `json:"ip"`                                         // 登录IP
+	Token     string    `json:"token"`                                      // 授权令牌
+	Manager   string    `gorm:"not null;default:'N';size:1" json:"manager"` // 操作权限 Y | N
+	Avatar    string    `json:"avatar"`                                     // 头像
+	CreatedBy string    `json:"created_by"`                                 // 创建人
+	IsEnable  bool      `json:"is_enable"`                                  // 是否启用 true| false
+	UUID      uuid.UUID `json:"uuid"`
 }
 
 // 系统管理员登录
 //  param username
 //  param password
-//  return Admin,error
-func (a *Admin) LoginAdmin() error {
+//  return SystemAdmin,error
+func (a *SystemAdmin) LoginSystemAdmin() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("username = ? AND password = ?", a.Username, a.Password).Find(&a).Error
 }
 
 // 添加系统管理员账号
-func (a *Admin) AddAdmin() error {
+func (a *SystemAdmin) AddSystemAdmin() error {
 	db := mysql.GetMysqlDB()
 	return db.Create(&a).Error
 }
 
 // 更新管理员 by id
-// 	param username
-// 	param password
-// 	param ip
-// 	param token
-// 	param manager
-// 	param avatar
-// 	param uuid
-//  return Admin,error
-func (a *Admin) UpdateAdmin(args map[string]interface{}) error {
+func (a *SystemAdmin) UpdateSystemAdmin(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&a).Update(args).Error
+	return db.Model(&a).Updates(args).Error
 }
 
 // 删除系统管理员(可批量)
 // 	param id
 //  return error
-func (a *Admin) DeleteAdmin(ids []int64) error {
+func (a *SystemAdmin) DeleteSystemAdmin(ids []int64) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
 	for _, id := range ids {
@@ -73,8 +68,8 @@ func (a *Admin) DeleteAdmin(ids []int64) error {
 // 	param id
 // 	param username
 // 	param token
-//  return Admin,error
-func (a *Admin) QueryAdmin() error {
+//  return SystemAdmin,error
+func (a *SystemAdmin) QuerySystemAdmin() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("id = ? OR username = ? OR (token = ? AND token IS NOT NULL)", a.ID, a.Username, a.Token).First(&a).Error
 }
@@ -82,10 +77,47 @@ func (a *Admin) QueryAdmin() error {
 // 批量查询系统管理员
 //  param username
 //  param manager
-//  return Admins
-func QueryAdmins(args map[string]interface{}, pageSize int, page int) (admins []Admin) {
+//  return SystemAdmins
+func QuerySystemAdmins(args map[string]interface{}, pageSize int, page int) (SystemAdmins []SystemAdmin) {
 	db := mysql.GetMysqlDB()
-	db.Where(args).Limit(pageSize).Offset((page - 1) * pageSize).Order("created_at desc").Find(&admins)
+	if args["username"] != nil && args["username"].(string) != "" {
+		db = db.Where("username LIKE ?", "%"+args["username"].(string)+"%")
+	}
+	if args["created_at_start"] != nil && args["created_at_end"] != nil {
+		created_at_start, _ := time.ParseInLocation("2006-01-02", args["created_at_start"].(string), time.Local)
+		created_at_end, _ := time.ParseInLocation("2006-01-02", args["created_at_end"].(string), time.Local)
+		if args["created_at_start"].(string) != "" && args["created_at_end"].(string) != "" {
+			db = db.Where("created_at BETWEEN ? AND ?", created_at_start, created_at_end)
+		} else {
+			if args["created_at_start"].(string) != "" {
+				created_at_start, _ := time.ParseInLocation("2006-01-02", args["created_at_start"].(string), time.Local)
+				db = db.Where("created_at > ?", created_at_start)
+			} else if args["created_at_end"].(string) != "" {
+				created_at_end, _ := time.ParseInLocation("2006-01-02", args["created_at_end"].(string), time.Local)
+				db = db.Where("created_at < ?", created_at_end)
+			}
+		}
+	} else {
+		if args["created_at_start"] != nil && args["created_at_start"].(string) != "" {
+			created_at_start, _ := time.ParseInLocation("2006-01-02", args["created_at_start"].(string), time.Local)
+			db = db.Where("created_at > ?", created_at_start)
+		} else if args["created_at_end"] != nil && args["created_at_end"].(string) != "" {
+			created_at_end, _ := time.ParseInLocation("2006-01-02", args["created_at_end"].(string), time.Local)
+			db = db.Where("created_at < ?", created_at_end)
+		}
+	}
+	if args["manager"] != nil && args["manager"].(string) != "" {
+		db = db.Where("manager = ?", args["manager"].(string))
+	}
+	if args["created_by"] != nil && args["created_by"].(string) != "" {
+		db = db.Where("created_by = ?", args["created_by"].(string))
+	}
+	if _, ok := args["is_enable"]; ok {
+		if args["is_enable"] != nil {
+			db = db.Where("is_enable = ?", args["is_enable"].(bool))
+		}
+	}
+	db.Limit(pageSize).Offset((page - 1) * pageSize).Order("created_at desc").Find(&SystemAdmins)
 	return
 }
 
@@ -93,8 +125,45 @@ func QueryAdmins(args map[string]interface{}, pageSize int, page int) (admins []
 // 	param username
 //  param manager
 //  return count
-func QueryAdminsCount(args map[string]interface{}) (count int) {
+func QuerySystemAdminsCount(args map[string]interface{}) (count int) {
 	db := mysql.GetMysqlDB()
-	db.Where(args).Model(&Admin{}).Count(&count)
+	if args["username"] != nil && args["username"].(string) != "" {
+		db = db.Where("username LIKE ?", "%"+args["username"].(string)+"%")
+	}
+	if args["created_at_start"] != nil && args["created_at_end"] != nil {
+		created_at_start, _ := time.ParseInLocation("2006-01-02", args["created_at_start"].(string), time.Local)
+		created_at_end, _ := time.ParseInLocation("2006-01-02", args["created_at_end"].(string), time.Local)
+		if args["created_at_start"].(string) != "" && args["created_at_end"].(string) != "" {
+			db = db.Where("created_at BETWEEN ? AND ?", created_at_start, created_at_end)
+		} else {
+			if args["created_at_start"].(string) != "" {
+				created_at_start, _ := time.ParseInLocation("2006-01-02", args["created_at_start"].(string), time.Local)
+				db = db.Where("created_at > ?", created_at_start)
+			} else if args["created_at_end"].(string) != "" {
+				created_at_end, _ := time.ParseInLocation("2006-01-02", args["created_at_end"].(string), time.Local)
+				db = db.Where("created_at < ?", created_at_end)
+			}
+		}
+	} else {
+		if args["created_at_start"] != nil && args["created_at_start"].(string) != "" {
+			created_at_start, _ := time.ParseInLocation("2006-01-02", args["created_at_start"].(string), time.Local)
+			db = db.Where("created_at > ?", created_at_start)
+		} else if args["created_at_end"] != nil && args["created_at_end"].(string) != "" {
+			created_at_end, _ := time.ParseInLocation("2006-01-02", args["created_at_end"].(string), time.Local)
+			db = db.Where("created_at < ?", created_at_end)
+		}
+	}
+	if args["manager"] != nil && args["manager"].(string) != "" {
+		db = db.Where("manager = ?", args["manager"].(string))
+	}
+	if args["created_by"] != nil && args["created_by"].(string) != "" {
+		db = db.Where("created_by = ?", args["created_by"].(string))
+	}
+	if _, ok := args["is_enable"]; ok {
+		if args["is_enable"] != nil {
+			db = db.Where("is_enable = ?", args["is_enable"].(bool))
+		}
+	}
+	db.Model(&SystemAdmin{}).Count(&count)
 	return
 }

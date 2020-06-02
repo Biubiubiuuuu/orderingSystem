@@ -9,14 +9,14 @@ import (
 // User model 用户表
 type User struct {
 	model.Model
-	Tel      string    `gorm:"not null;unique;size:20" json:"tel"` // 手机号
-	Password string    `gorm:"size:50" json:"-"`                   // 密码
-	IP       string    `gorm:"size:30" json:"ip"`                  // 登录IP
-	Token    string    `gorm:"size:30" json:"token"`               // 授权令牌
-	Avatar   string    `gorm:"size:10" json:"avatar"`              // 头像
-	UUID     uuid.UUID `json:"uuid"`                               // uuid
-	Wechat   WeChat    `json:"wechat"`                             // 微信信息
-	WechatID int64     `json:"-"`                                  // 微信信息ID
+	Tel      string    `gorm:"not null;unique" json:"tel"` // 手机号
+	Password string    `json:"-"`                          // 密码
+	IP       string    `json:"ip"`                         // 登录IP
+	Token    string    `json:"token"`                      // 授权令牌
+	Avatar   string    `json:"avatar"`                     // 头像
+	UUID     uuid.UUID `json:"uuid"`                       // uuid
+	Wechat   WeChat    `json:"wechat"`                     // 微信信息
+	WechatID int64     `json:"-"`                          // 微信信息ID
 }
 
 type WeChat struct {
@@ -56,5 +56,5 @@ func (u *User) QueryUser() error {
 // 更新用户信息
 func (u *User) UpdateUser(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&u).Update(args).Error
+	return db.Model(&u).Updates(args).Error
 }

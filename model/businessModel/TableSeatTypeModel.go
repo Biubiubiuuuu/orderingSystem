@@ -26,7 +26,7 @@ func (t *TableSeatType) AddTableSeatType() error {
 // 修改餐桌分类
 func (t *TableSeatType) UpdateTableSeatType(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&t).Update(args).Error
+	return db.Model(&t).Updates(args).Error
 }
 
 // 查询餐桌分类

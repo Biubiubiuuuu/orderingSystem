@@ -30,7 +30,7 @@ func (g *Goods) AddGoods() error {
 // 修改商品
 func (g *Goods) UpdateGoods(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&g).Update(args).Error
+	return db.Model(&g).Updates(args).Error
 }
 
 // 查询商品

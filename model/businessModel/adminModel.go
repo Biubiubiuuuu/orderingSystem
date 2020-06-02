@@ -6,17 +6,17 @@ import (
 	"github.com/google/uuid"
 )
 
-// Admin model 商家管理员
-type Admin struct {
+// BusinessAdmin model 商家管理员
+type BusinessAdmin struct {
 	model.Model
-	Tel      string    `gorm:"not null;unique;size:20" json:"tel"` // 手机号
-	Password string    `gorm:"size:50" json:"-"`                   // 密码
-	IP       string    `gorm:"size:30" json:"ip"`                  // 登录IP
-	Token    string    `gorm:"size:30" json:"token"`               // 授权令牌
-	Avatar   string    `gorm:"size:10" json:"avatar"`              // 头像
-	UUID     uuid.UUID `json:"uuid"`                               // uuid
-	Wechat   WeChat    `json:"wechat"`                             // 微信信息
-	WechatID int64     `json:"-"`                                  // 微信信息ID
+	Tel      string    `gorm:"not null;unique;" json:"tel"` // 手机号
+	Password string    `json:"-"`                           // 密码
+	IP       string    `json:"ip"`                          // 登录IP
+	Token    string    `json:"token"`                       // 授权令牌
+	Avatar   string    `json:"avatar"`                      // 头像
+	UUID     uuid.UUID `json:"uuid"`                        // uuid
+	Wechat   WeChat    `json:"wechat"`                      // 微信信息
+	WechatID int64     `json:"-"`                           // 微信信息ID
 }
 
 type WeChat struct {
@@ -30,7 +30,7 @@ type WeChat struct {
 }
 
 // 注册
-func (a *Admin) RegisterAdmin() error {
+func (a *BusinessAdmin) RegisterBusinessAdmin() error {
 	db := mysql.GetMysqlDB()
 	return db.Create(&a).Error
 }
@@ -38,7 +38,7 @@ func (a *Admin) RegisterAdmin() error {
 // 验证手机号是否已注册
 //  param tel
 //  return error
-func (a *Admin) VerificationTelRegistered() error {
+func (a *BusinessAdmin) VerificationTelRegistered() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("tel = ?", a.Tel).First(&a).Error
 }
@@ -47,7 +47,7 @@ func (a *Admin) VerificationTelRegistered() error {
 //  param tel
 //  param password
 //  return error
-func (a *Admin) Login() error {
+func (a *BusinessAdmin) Login() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("tel = ? AND password = ?", a.Tel, a.Password).First(&a).Error
 }
@@ -56,8 +56,8 @@ func (a *Admin) Login() error {
 // 	param id
 // 	param username
 // 	param token
-//  return Admin,error
-func (a *Admin) QueryAdmin() error {
+//  return BusinessAdmin,error
+func (a *BusinessAdmin) QueryBusinessAdmin() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("id = ? OR tel = ? OR (token = ? AND token IS NOT NULL)", a.ID, a.Tel, a.Token).First(&a).Error
 }
@@ -71,8 +71,8 @@ func (a *Admin) QueryAdmin() error {
 // 	param avatar
 // 	param uuid
 //  param stores
-//  return Admin,error
-func (a *Admin) UpdateAdmin(args map[string]interface{}) error {
+//  return BusinessAdmin,error
+func (a *BusinessAdmin) UpdateBusinessAdmin(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&a).Update(args).Error
+	return db.Model(&a).Updates(args).Error
 }

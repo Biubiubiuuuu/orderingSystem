@@ -54,5 +54,5 @@ func (s *StoreQualificationInfo) AddStoreCertification() error {
 // 修改认证信息
 func (s *StoreQualificationInfo) UpdateStoreCertification(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&s).Update(args).Error
+	return db.Model(&s).Updates(args).Error
 }

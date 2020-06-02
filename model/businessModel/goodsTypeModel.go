@@ -25,7 +25,7 @@ func (g *GoodsType) AddGoodsType() error {
 // 修改商品分类
 func (g *GoodsType) UpdateGoodsType(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&g).Update(args).Error
+	return db.Model(&g).Updates(args).Error
 }
 
 // 查询商品分类
