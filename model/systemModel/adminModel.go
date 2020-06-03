@@ -2,6 +2,7 @@ package systemModel
 
 import (
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
@@ -13,6 +14,7 @@ import (
 type SystemAdmin struct {
 	model.Model
 	Username  string    `gorm:"not null;unique;" json:"username"`           // 用户名
+	Nikename  string    `json:"nikename"`                                   // 昵称
 	Password  string    `gorm:"not null;" json:"-"`                         // 密码
 	IP        string    `json:"ip"`                                         // 登录IP
 	Token     string    `json:"token"`                                      // 授权令牌
@@ -47,14 +49,15 @@ func (a *SystemAdmin) UpdateSystemAdmin(args map[string]interface{}) error {
 // 删除系统管理员(可批量)
 // 	param id
 //  return error
-func (a *SystemAdmin) DeleteSystemAdmin(ids []int64) error {
+func (a *SystemAdmin) DeleteSystemAdmin(ids []string) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
 	for _, id := range ids {
-		if id == 0 {
+		if id == "" {
 			return errors.New("id is not 0")
 		}
-		a.ID = id
+		v, _ := strconv.ParseInt(id, 10, 64)
+		a.ID = v
 		if err := tx.Delete(&a).Error; err != nil {
 			tx.Rollback()
 			return err

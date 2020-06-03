@@ -16,6 +16,7 @@ type SystemAdminLoginRequest struct {
 // 系统管理员添加请求结构体
 type SystemAdminAddRequest struct {
 	Username string `json:"username"`  // 用户名
+	Nikename string `json:"nikename"`  // 昵称
 	Password string `json:"password"`  // 密码
 	Manager  string `json:"manager"`   // 操作权限 Y | N
 	Avatar   string `json:"avatar"`    // 头像
@@ -30,5 +31,5 @@ type SystemAdminUpdatePassRequest struct {
 
 // 删除ids
 type DeleteIds struct {
-	Ids []int64 `json:"ids"` // ids
+	Ids []string `json:"ids"` // ids
 }

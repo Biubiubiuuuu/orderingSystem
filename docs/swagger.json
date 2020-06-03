@@ -5,43 +5,7 @@
         "license": {}
     },
     "paths": {
-        "/api/v1/admin/deleteAdmin": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "系统管理员"
-                ],
-                "summary": "删除管理员",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "desc",
-                        "schema": {
-                            "$ref": "#/definitions/entity.ResponseData"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/admin/deleteAdmins": {
+        "/api/v1/admin/admins/{ids}": {
             "post": {
                 "security": [
                     {
@@ -60,13 +24,11 @@
                 "summary": "批量删除管理员",
                 "parameters": [
                     {
-                        "description": "body",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.DeleteIds"
-                        }
+                        "type": "integer",
+                        "description": "Account ID 多个用,分开",
+                        "name": "ids",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -79,7 +41,84 @@
                 }
             }
         },
-        "/api/v1/systemadmin/add": {
+        "/api/v1/system/admin": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统管理员"
+                ],
+                "summary": "查询管理员by token",
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统管理员"
+                ],
+                "summary": "修改管理员",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "昵称",
+                        "name": "nikename",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "操作权限 Y | N",
+                        "name": "manager",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "用户头像",
+                        "name": "avatar",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否启用",
+                        "name": "is_enable",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -106,6 +145,12 @@
                     },
                     {
                         "type": "string",
+                        "description": "昵称",
+                        "name": "nikename",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
                         "description": "密码",
                         "name": "password",
                         "in": "formData",
@@ -124,7 +169,7 @@
                         "in": "formData"
                     },
                     {
-                        "type": "string",
+                        "type": "boolean",
                         "description": "是否启用",
                         "name": "is_enable",
                         "in": "formData"
@@ -140,8 +185,8 @@
                 }
             }
         },
-        "/api/v1/systemadmin/isEnableAdmin": {
-            "post": {
+        "/api/v1/system/admin/enable/{id}": {
+            "put": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -158,6 +203,13 @@
                 ],
                 "summary": "启用/禁用管理员",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "boolean",
                         "description": "启用/禁用管理员",
@@ -176,8 +228,13 @@
                 }
             }
         },
-        "/api/v1/systemadmin/login": {
-            "post": {
+        "/api/v1/system/admin/manager/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -187,7 +244,50 @@
                 "tags": [
                     "系统管理员"
                 ],
-                "summary": "管理员登录",
+                "summary": "授权/禁止管理员权限",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Y：授权/ N：禁止",
+                        "name": "is_manager",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/system/admin/password": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统管理员"
+                ],
+                "summary": "修改管理员密码",
                 "parameters": [
                     {
                         "description": "body",
@@ -195,7 +295,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.SystemAdminLoginRequest"
+                            "$ref": "#/definitions/entity.SystemAdminUpdatePassRequest"
                         }
                     }
                 ],
@@ -209,7 +309,7 @@
                 }
             }
         },
-        "/api/v1/systemadmin/queryAdmin": {
+        "/api/v1/system/admin/{id}": {
             "get": {
                 "security": [
                     {
@@ -225,7 +325,50 @@
                 "tags": [
                     "系统管理员"
                 ],
-                "summary": "查询管理员",
+                "summary": "查询管理员by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统管理员"
+                ],
+                "summary": "删除管理员",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Account ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "desc",
@@ -236,7 +379,7 @@
                 }
             }
         },
-        "/api/v1/systemadmin/queryAdmins": {
+        "/api/v1/system/admins": {
             "get": {
                 "security": [
                     {
@@ -285,7 +428,7 @@
                         "in": "query"
                     },
                     {
-                        "type": "string",
+                        "type": "boolean",
                         "description": "是否启用",
                         "name": "is_enable",
                         "in": "query"
@@ -313,66 +456,8 @@
                 }
             }
         },
-        "/api/v1/systemadmin/updateAdmin": {
+        "/api/v1/system/login": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "系统管理员"
-                ],
-                "summary": "修改管理员",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "用户名",
-                        "name": "username",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "操作权限 Y | N",
-                        "name": "manager",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "file",
-                        "description": "用户头像",
-                        "name": "avatar",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "是否启用",
-                        "name": "is_enable",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "desc",
-                        "schema": {
-                            "$ref": "#/definitions/entity.ResponseData"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/systemadmin/updatePass": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -382,7 +467,7 @@
                 "tags": [
                     "系统管理员"
                 ],
-                "summary": "修改管理员密码",
+                "summary": "管理员登录",
                 "parameters": [
                     {
                         "description": "body",
@@ -390,7 +475,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.SystemAdminUpdatePassRequest"
+                            "$ref": "#/definitions/entity.SystemAdminLoginRequest"
                         }
                     }
                 ],
@@ -406,18 +491,6 @@
         }
     },
     "definitions": {
-        "entity.DeleteIds": {
-            "type": "object",
-            "properties": {
-                "ids": {
-                    "description": "ids",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
         "entity.ResponseData": {
             "type": "object",
             "properties": {

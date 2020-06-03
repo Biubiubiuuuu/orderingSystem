@@ -45,22 +45,24 @@ func Init() *gin.Engine {
 // 系统管理员
 func InitSystemAdmin(router *gin.Engine) {
 	// 路由分组
-	api := router.Group("/api/v1/systemadmin")
+	api := router.Group("/api/v1/system")
 	// get post update delete...
 	api.POST("login", systemController.Login)
 	api.Use(jwtMiddleware.JWT())
 	{
-		api.POST("updatePass", systemController.UpdatePass)
-		api.GET("queryAdmins", systemController.QueryAdmins)
-		api.GET("queryAdmin", systemController.QueryAdmin)
-		api.POST("updateAdmin", systemController.UpdateAdmin)
+		api.GET("admin", systemController.QueryAdmin)
+		api.GET("admin/:id", systemController.QueryAdminByID)
+		api.GET("admins", systemController.QueryAdmins)
+		api.PUT("admin/password", systemController.UpdatePass)
+		api.PUT("admin", systemController.UpdateAdmin)
 		// 需要管理权限manager为Y才能操作
 		api.Use(systemMiddleware.AdminAuth())
 		{
-			api.POST("addAdmin", systemController.AddAdmin)
-			api.POST("isEnableAdmin", systemController.IsEnableAdmin)
-			api.POST("deleteAdmins", systemController.DeleteAdmins)
-			api.DELETE("deleteAdmin", systemController.DeleteAdmin)
+			api.POST("admin", systemController.AddAdmin)
+			api.PUT("admin/enable/:id", systemController.IsEnableAdmin)
+			api.PUT("admin/manager/:id", systemController.IsManagerAdmin)
+			api.DELETE("admins/:ids", systemController.DeleteAdmins)
+			api.DELETE("admin/:id", systemController.DeleteAdmin)
 		}
 	}
 }

@@ -19,7 +19,7 @@ import (
 // @Produce  json
 // @Param body body entity.SystemAdminLoginRequest true "body"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/systemadmin/login [POST]
+// @Router /api/v1/system/login [POST]
 func Login(c *gin.Context) {
 	req := entity.SystemAdminLoginRequest{}
 	res := entity.ResponseData{}
@@ -36,12 +36,13 @@ func Login(c *gin.Context) {
 // @Accept  multipart/form-data
 // @Produce  json
 // @Param username formData string true "用户名"
+// @Param nikename formData string false "昵称"
 // @Param password formData string true "密码"
 // @Param manager formData string false "操作权限 Y | N"
 // @Param avatar formData file false "用户头像"
-// @Param is_enable formData string false "是否启用"
+// @Param is_enable formData bool false "是否启用"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/systemadmin/add [POST]
+// @Router /api/v1/system/admin [POST]
 // @Security ApiKeyAuth
 func AddAdmin(c *gin.Context) {
 	res := entity.ResponseData{}
@@ -73,14 +74,18 @@ func AddAdmin(c *gin.Context) {
 		pathFile = pathFile + filename
 		// 获取主机头
 		r := c.Request
-		host := r.URL.Host
+		host := r.Host
 		if err := c.SaveUploadedFile(file, pathFile); err == nil {
+			if strings.HasPrefix(host, "http://") == false {
+				host = "http://" + host
+			}
 			avatar = host + "/" + pathFile
 		}
 	}
 	is_enable, _ := strconv.ParseBool(c.DefaultPostForm("is_enable", "false"))
 	req := entity.SystemAdminAddRequest{
 		Username: c.PostForm("username"),
+		Nikename: c.PostForm("nikename"),
 		Password: c.DefaultPostForm("password", "123456"),
 		Manager:  c.DefaultPostForm("manager", "N"),
 		Avatar:   avatar,
@@ -96,7 +101,7 @@ func AddAdmin(c *gin.Context) {
 // @Produce  json
 // @Param body body entity.SystemAdminUpdatePassRequest true "body"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/systemadmin/updatePass [POST]
+// @Router /api/v1/system/admin/password [PUT]
 // @Security ApiKeyAuth
 func UpdatePass(c *gin.Context) {
 	res := entity.ResponseData{}
@@ -116,7 +121,7 @@ func UpdatePass(c *gin.Context) {
 	} else {
 		res = systemService.UpdatePass(token, req)
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusCreated, res)
 }
 
 // @Summary 分页查询管理员(默认前100条) 并返回总记录数
@@ -128,11 +133,11 @@ func UpdatePass(c *gin.Context) {
 // @Param created_at_end query string false "创建结束时间"
 // @Param manager query string false "操作权限"
 // @Param created_by query string false "创建人"
-// @Param is_enable query string false "是否启用"
+// @Param is_enable query bool false "是否启用"
 // @Param pageSize query string false "页大小"
 // @Param page query string false "页数"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/systemadmin/queryAdmins [GET]
+// @Router /api/v1/system/admins [GET]
 // @Security ApiKeyAuth
 func QueryAdmins(c *gin.Context) {
 	username := c.Query("username")
@@ -156,21 +161,20 @@ func QueryAdmins(c *gin.Context) {
 		args["is_enable"] = is_enable
 	}
 	res := systemService.QueryByLimitOffset(args, pageSize, page)
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusCreated, res)
 }
 
 // @Summary 删除管理员
 // @tags 系统管理员
 // @Accept  application/json
 // @Produce  json
-// @Param id query string true "id"
+// @Param id path int true "Account ID"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/admin/deleteAdmin [DELETE]
+// @Router /api/v1/system/admin/{id} [DELETE]
 // @Security ApiKeyAuth
 func DeleteAdmin(c *gin.Context) {
 	req := entity.DeleteIds{}
-	id, _ := strconv.ParseInt(c.DefaultQuery("id", "0"), 10, 64)
-	ids := append(req.Ids, id)
+	ids := append(req.Ids, c.Param("id"))
 	res := systemService.DeleteAdmin(ids)
 	c.JSON(http.StatusOK, res)
 }
@@ -179,19 +183,14 @@ func DeleteAdmin(c *gin.Context) {
 // @tags 系统管理员
 // @Accept  application/json
 // @Produce  json
-// @Param body body entity.DeleteIds true "body"
+// @Param ids path int true "Account ID 多个用,分开"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/admin/deleteAdmins [POST]
+// @Router /api/v1/admin/admins/{ids} [POST]
 // @Security ApiKeyAuth
 func DeleteAdmins(c *gin.Context) {
 	res := entity.ResponseData{}
-	req := entity.DeleteIds{}
-	// 参数校验
-	if c.ShouldBindJSON(&req) != nil {
-		res.Message = "请求参数json错误"
-	} else {
-		res = systemService.DeleteAdmin(req.Ids)
-	}
+	ids := strings.Split(",", c.Param("ids"))
+	res = systemService.DeleteAdmin(ids)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -199,24 +198,33 @@ func DeleteAdmins(c *gin.Context) {
 // @tags 系统管理员
 // @Accept  application/json
 // @Produce  json
+// @Param id path int true "Account ID"
 // @Param is_enable query bool true "启用/禁用管理员"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/systemadmin/isEnableAdmin [POST]
+// @Router /api/v1/system/admin/enable/{id} [PUT]
 // @Security ApiKeyAuth
 func IsEnableAdmin(c *gin.Context) {
 	res := entity.ResponseData{}
-	token := c.Query("token")
-	if token == "" {
-		authToken := c.GetHeader("Authorization")
-		if authToken == "" {
-			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
-			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
-			return
-		}
-		token = strings.TrimSpace(authToken)
-	}
-	is_enable, _ := strconv.ParseBool(c.DefaultQuery("is_enable", "false"))
-	res = systemService.IsEnableAdmin(token, is_enable)
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	is_enable, _ := strconv.ParseBool(c.Query("is_enable"))
+	res = systemService.IsEnableAdmin(id, is_enable)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 授权/禁止管理员权限
+// @tags 系统管理员
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "Account ID"
+// @Param is_manager query string true "Y：授权/ N：禁止"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/system/admin/manager/{id} [PUT]
+// @Security ApiKeyAuth
+func IsManagerAdmin(c *gin.Context) {
+	res := entity.ResponseData{}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	is_manager := c.Query("is_manager")
+	res = systemService.IsManagerAdmin(id, is_manager)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -224,12 +232,12 @@ func IsEnableAdmin(c *gin.Context) {
 // @tags 系统管理员
 // @Accept  multipart/form-data
 // @Produce  json
-// @Param username formData string false "用户名"
+// @Param nikename formData string false "昵称"
 // @Param manager formData string false "操作权限 Y | N"
 // @Param avatar formData file false "用户头像"
-// @Param is_enable formData string false "是否启用"
+// @Param is_enable formData bool true "是否启用"
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/systemadmin/updateAdmin [POST]
+// @Router /api/v1/system/admin [PUT]
 // @Security ApiKeyAuth
 func UpdateAdmin(c *gin.Context) {
 	res := entity.ResponseData{}
@@ -271,21 +279,21 @@ func UpdateAdmin(c *gin.Context) {
 	}
 	is_enable, _ := strconv.ParseBool(c.DefaultPostForm("is_enable", "false"))
 	args := map[string]interface{}{
-		"username":  c.PostForm("username"),
+		"nikename":  c.PostForm("nikename"),
 		"manager":   c.DefaultPostForm("manager", "N"),
 		"avatar":    avatar,
 		"is_enable": is_enable,
 	}
 	res = systemService.UpdateAdmin(token, args)
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusCreated, res)
 }
 
-// @Summary 查询管理员
+// @Summary 查询管理员by token
 // @tags 系统管理员
 // @Accept  application/json
 // @Produce  json
 // @Success 200 {object} entity.ResponseData "desc"
-// @Router /api/v1/systemadmin/queryAdmin [GET]
+// @Router /api/v1/system/admin [GET]
 // @Security ApiKeyAuth
 func QueryAdmin(c *gin.Context) {
 	res := entity.ResponseData{}
@@ -300,5 +308,20 @@ func QueryAdmin(c *gin.Context) {
 		token = strings.TrimSpace(authToken)
 	}
 	res = systemService.QueryAdminByToken(token)
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusCreated, res)
+}
+
+// @Summary 查询管理员by id
+// @tags 系统管理员
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "Account ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/system/admin/{id} [GET]
+// @Security ApiKeyAuth
+func QueryAdminByID(c *gin.Context) {
+	res := entity.ResponseData{}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	res = systemService.QueryAdminByID(id)
+	c.JSON(http.StatusCreated, res)
 }
