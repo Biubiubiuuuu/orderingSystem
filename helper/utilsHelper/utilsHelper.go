@@ -40,13 +40,24 @@ func GetTimestamp() int64 {
 }
 
 // 时间戳转时间yyyy-MM-dd HH:mm:ss
-func TimestampToTime(timestamp int64) string {
+func TimestampToSTime(timestamp int64) string {
 	tm := time.Unix(timestamp, 0)
 	return tm.Format(Time_Format)
 }
 
-// 时间转time
-func StringToTime(strTime string) time.Time {
+// 时间戳转time
+func TimestampToTime(timestamp int64) time.Time {
+	return time.Unix(timestamp, 0)
+}
+
+// 时间yyyy-MM-dd转time
+func StringToDTime(strTime string) time.Time {
 	time, _ := time.ParseInLocation(TimeFormat, strTime, time.Local)
+	return time
+}
+
+// 时间yyyy-MM-dd HH:mm:ss转time
+func StringToSTime(strTime string) time.Time {
+	time, _ := time.ParseInLocation(Time_Format, strTime, time.Local)
 	return time
 }

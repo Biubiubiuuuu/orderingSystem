@@ -29,40 +29,37 @@ type WeChat struct {
 	Country   string `json:"country"`    // 用户国家
 }
 
-// 注册
+// 注册商家
 func (a *BusinessAdmin) RegisterBusinessAdmin() error {
 	db := mysql.GetMysqlDB()
 	return db.Create(&a).Error
 }
 
-// 验证手机号是否已注册
-//  param tel
-//  return error
-func (a *BusinessAdmin) VerificationTelRegistered() error {
-	db := mysql.GetMysqlDB()
-	return db.Where("tel = ?", a.Tel).First(&a).Error
-}
-
-// 登录
-//  param tel
-//  param password
-//  return error
-func (a *BusinessAdmin) Login() error {
-	db := mysql.GetMysqlDB()
-	return db.Where("tel = ? AND password = ?", a.Tel, a.Password).First(&a).Error
-}
-
-// 查询门店管理员
+// 查询商家 by ID
 // 	param id
-// 	param username
+//  return BusinessAdmin,error
+func (a *BusinessAdmin) QueryUserByID() error {
+	db := mysql.GetMysqlDB()
+	return db.Where("id = ? ", a.ID).First(&a).Error
+}
+
+// 查询商家 by tel
+// 	param tel
+//  return BusinessAdmin,error
+func (a *BusinessAdmin) QueryUserByTel() error {
+	db := mysql.GetMysqlDB()
+	return db.Where("tel = ? ", a.Tel).First(&a).Error
+}
+
+// 查询商家 by token
 // 	param token
 //  return BusinessAdmin,error
-func (a *BusinessAdmin) QueryBusinessAdmin() error {
+func (a *BusinessAdmin) QueryUserByToken() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ? OR tel = ? OR (token = ? AND token IS NOT NULL)", a.ID, a.Tel, a.Token).First(&a).Error
+	return db.Where("token = ? AND ISNULL(token)=0 AND LENGTH(trim(token))>0", a.Token).First(&a).Error
 }
 
-// 更新管理员 by id
+// 更新商家 by id
 // 	param tel
 // 	param password
 // 	param ip

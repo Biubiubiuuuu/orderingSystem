@@ -1,4 +1,22 @@
 definitions:
+  entity.BusinessLoginOrRegisterRequest:
+    properties:
+      code:
+        description: 验证码
+        type: string
+      tel:
+        description: 手机号码
+        type: string
+    type: object
+  entity.BusinessPassLoginRequest:
+    properties:
+      password:
+        description: 密码
+        type: string
+      tel:
+        description: 手机号码
+        type: string
+    type: object
   entity.ResponseData:
     properties:
       data:
@@ -56,6 +74,105 @@ paths:
       summary: 批量删除管理员
       tags:
       - 系统管理员
+  /api/v1/business/codelogin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.BusinessLoginOrRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      summary: 商家手机验证码登录
+      tags:
+      - 商家
+  /api/v1/business/passlogin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.BusinessPassLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      summary: 商家账号密码登录
+      tags:
+      - 商家
+  /api/v1/business/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.BusinessLoginOrRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      summary: 商家注册
+      tags:
+      - 商家
+  /api/v1/business/store:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询商家门店信息
+      tags:
+      - 商家
+  /api/v1/common/verificationcode:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 手机号码
+        in: query
+        name: tel
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      summary: 获取验证码
+      tags:
+      - 公共接口
   /api/v1/system/admin:
     get:
       consumes:

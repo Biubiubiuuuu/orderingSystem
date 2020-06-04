@@ -7,7 +7,7 @@ import (
 )
 
 // 生成验证码
-func VerificationCode(tel string, createtime int64) (res entity.ResponseData) {
+func VerificationCode(tel string) (res entity.ResponseData) {
 	if tel == "" {
 		res.Message = "手机号码不能为空"
 		return
@@ -23,7 +23,7 @@ func VerificationCode(tel string, createtime int64) (res entity.ResponseData) {
 	}
 	v := commonModel.Verificationcode{
 		Tel:        tel,
-		CreateTime: createtime,
+		CreateTime: utilsHelper.GetTimestamp(),
 		Code:       code,
 	}
 	if err := v.AddVerificationcode(); err != nil {
@@ -31,7 +31,9 @@ func VerificationCode(tel string, createtime int64) (res entity.ResponseData) {
 		return
 	}
 	// 短信通知接口
-
+	data := make(map[string]interface{})
+	data["code"] = code
+	res.Data = data
 	res.Message = "获取验证码成功"
 	res.Status = true
 	return

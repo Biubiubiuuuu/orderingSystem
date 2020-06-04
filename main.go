@@ -21,7 +21,7 @@ func main() {
 	db.AutoMigrate(&systemModel.SystemAdmin{}, &businessModel.BusinessAdmin{})
 	// 添加默认管理员 username:Admin,password:123456
 	a := systemModel.SystemAdmin{Username: "admin", Password: encryptHelper.EncryptMD5To32Bit("123456"), Manager: "Y"}
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByUsername(); err != nil {
 		a.AddSystemAdmin()
 	}
 	//初始化redis

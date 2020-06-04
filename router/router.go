@@ -1,6 +1,8 @@
 package router
 
 import (
+	"github.com/Biubiubiuuuu/orderingSystem/controller/businessController"
+	"github.com/Biubiubiuuuu/orderingSystem/controller/commonController"
 	"github.com/Biubiubiuuuu/orderingSystem/controller/systemController"
 	"github.com/Biubiubiuuuu/orderingSystem/docs"
 	"github.com/Biubiubiuuuu/orderingSystem/helper/configHelper"
@@ -32,9 +34,10 @@ func Init() *gin.Engine {
 	router.Static("/static", "./static")
 	//允许跨域请求
 	router.Use(crossMiddleware.Cors())
-
 	// 自定义router
 	InitSystemAdmin(router)
+	InitCommon(router)
+	InitBusiness(router)
 	//gin swaager
 	router.GET("/swagger/*any", ginswagger.WrapHandler(swaggerFiles.Handler))
 	//404
@@ -44,25 +47,50 @@ func Init() *gin.Engine {
 
 // 系统管理员
 func InitSystemAdmin(router *gin.Engine) {
-	// 路由分组
 	api := router.Group("/api/v1/system")
-	// get post update delete...
 	api.POST("login", systemController.Login)
 	api.Use(jwtMiddleware.JWT())
 	{
-		api.GET("admin", systemController.QueryAdmin)
-		api.GET("admin/:id", systemController.QueryAdminByID)
 		api.GET("admins", systemController.QueryAdmins)
-		api.PUT("admin/password", systemController.UpdatePass)
-		api.PUT("admin", systemController.UpdateAdmin)
 		// 需要管理权限manager为Y才能操作
 		api.Use(systemMiddleware.AdminAuth())
 		{
-			api.POST("admin", systemController.AddAdmin)
-			api.PUT("admin/enable/:id", systemController.IsEnableAdmin)
-			api.PUT("admin/manager/:id", systemController.IsManagerAdmin)
 			api.DELETE("admins/:ids", systemController.DeleteAdmins)
-			api.DELETE("admin/:id", systemController.DeleteAdmin)
 		}
+	}
+
+	apiA := router.Group("/api/v1/system/admin")
+	apiA.Use(jwtMiddleware.JWT())
+	{
+		apiA.GET("", systemController.QueryAdmin)
+		apiA.GET(":id", systemController.QueryAdminByID)
+		apiA.PUT("password", systemController.UpdatePass)
+		apiA.PUT("", systemController.UpdateAdmin)
+		apiA.Use(systemMiddleware.AdminAuth())
+		{
+			apiA.POST("", systemController.AddAdmin)
+			apiA.PUT("enable/:id", systemController.IsEnableAdmin)
+			apiA.PUT("manager/:id", systemController.IsManagerAdmin)
+			apiA.DELETE(":id", systemController.DeleteAdmin)
+		}
+	}
+}
+
+// 公共接口
+func InitCommon(router *gin.Engine) {
+	api := router.Group("/api/v1/common")
+	api.GET("verificationcode", commonController.VerificationCode)
+}
+
+// 商家
+func InitBusiness(router *gin.Engine) {
+	api := router.Group("/api/v1/business")
+	api.POST("register", businessController.Register)
+	api.POST("codelogin", businessController.CodeLogin)
+	api.POST("passlogin", businessController.PassLogin)
+	apiS := router.Group("/api/v1/business/store")
+	apiS.Use(jwtMiddleware.JWT())
+	{
+		apiS.GET("", businessController.QueryBusinessStoreInfo)
 	}
 }

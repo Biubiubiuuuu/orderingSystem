@@ -33,3 +33,15 @@ type SystemAdminUpdatePassRequest struct {
 type DeleteIds struct {
 	Ids []string `json:"ids"` // ids
 }
+
+// 商家注册请求、手机验证码登录结构体
+type BusinessLoginOrRegisterRequest struct {
+	Tel  string `json:"tel"`  // 手机号码
+	Code string `json:"code"` // 验证码
+}
+
+// 商家账号密码登录请求结构体
+type BusinessPassLoginRequest struct {
+	Tel      string `json:"tel"`      // 手机号码
+	Password string `json:"password"` // 密码
+}

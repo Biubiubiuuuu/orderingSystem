@@ -46,7 +46,7 @@ func Add(token string, req entity.SystemAdminAddRequest) (res entity.ResponseDat
 		return
 	}
 	a := systemModel.SystemAdmin{Token: token}
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByToken(); err != nil {
 		res.Message = "修改失败，token错误，未找到系统管理员信息"
 		return
 	}
@@ -62,7 +62,7 @@ func Add(token string, req entity.SystemAdminAddRequest) (res entity.ResponseDat
 		Nikename:  req.Nikename,
 		IsEnable:  req.IsEnable,
 	}
-	if err := newAdmin.QuerySystemAdmin(); err == nil {
+	if err := newAdmin.QuerySystemAdminByUsername(); err == nil {
 		res.Message = "添加失败，用户名已存在"
 		return
 	}
@@ -82,7 +82,7 @@ func UpdatePass(token string, req entity.SystemAdminUpdatePassRequest) (res enti
 		return
 	}
 	a := systemModel.SystemAdmin{Token: token}
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByToken(); err != nil {
 		res.Message = "修改失败，token错误，未找到系统管理员信息"
 		return
 	}
@@ -115,7 +115,7 @@ func QueryByLimitOffset(args map[string]interface{}, pageSize int, page int) (re
 func IsEnableAdmin(id int64, is_enable bool) (res entity.ResponseData) {
 	a := systemModel.SystemAdmin{}
 	a.ID = id
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByID(); err != nil {
 		res.Message = "修改失败，用户ID不存在"
 		return
 	}
@@ -133,7 +133,7 @@ func IsEnableAdmin(id int64, is_enable bool) (res entity.ResponseData) {
 func IsManagerAdmin(id int64, is_manager string) (res entity.ResponseData) {
 	a := systemModel.SystemAdmin{}
 	a.ID = id
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByID(); err != nil {
 		res.Message = "修改失败，用户ID不存在"
 		return
 	}
@@ -169,7 +169,7 @@ func DeleteAdmin(ids []string) (res entity.ResponseData) {
 // 修改管理员
 func UpdateAdmin(token string, args map[string]interface{}) (res entity.ResponseData) {
 	a := systemModel.SystemAdmin{Token: token}
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByToken(); err != nil {
 		res.Message = "修改失败，token错误，未找到系统管理员信息"
 		return
 	}
@@ -194,7 +194,7 @@ func UpdateAdmin(token string, args map[string]interface{}) (res entity.Response
 // 查询管理员信息ByToken
 func QueryAdminByToken(token string) (res entity.ResponseData) {
 	a := systemModel.SystemAdmin{Token: token}
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByToken(); err != nil {
 		res.Message = "查询失败，token错误，未找到系统管理员信息"
 		return
 	}
@@ -210,7 +210,7 @@ func QueryAdminByToken(token string) (res entity.ResponseData) {
 func QueryAdminByID(id int64) (res entity.ResponseData) {
 	a := systemModel.SystemAdmin{}
 	a.ID = id
-	if err := a.QuerySystemAdmin(); err != nil {
+	if err := a.QuerySystemAdminByID(); err != nil {
 		res.Message = "查询失败，用户ID不存在"
 		return
 	}

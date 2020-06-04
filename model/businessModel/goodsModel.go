@@ -27,22 +27,22 @@ func (g *Goods) AddGoods() error {
 	return db.Create(&g).Error
 }
 
-// 修改商品
-func (g *Goods) UpdateGoods(args map[string]interface{}) error {
+// 修改商品by id
+func (g *Goods) UpdateGoodsByID(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
 	return db.Model(&g).Updates(args).Error
 }
 
-// 查询商品
-func (g *Goods) QueryGoods() error {
+// 查询商品by id
+func (g *Goods) QueryGoodsByID() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("id = ?", g.ID).First(&g).Error
 }
 
 // 删除商品(可批量)
-// 	param id
+// 	param ids
 //  return error
-func (g *Goods) DeleteGoods(ids []int64) error {
+func (g *Goods) DeleteGoodsByIds(ids []int64) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
 	for _, id := range ids {
@@ -60,7 +60,7 @@ func (g *Goods) DeleteGoods(ids []int64) error {
 }
 
 // 检查商家是否已创建相同的商品名称
-func (g *Goods) QueryGoodsExistName() error {
+func (g *Goods) QueryGoodsExistNameByAdminId() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("goods_name = ? AND admin_id = ?", g.GoodsName, g.AdminID).Error
 }

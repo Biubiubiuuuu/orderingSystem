@@ -67,14 +67,28 @@ func (a *SystemAdmin) DeleteSystemAdmin(ids []string) error {
 	return nil
 }
 
-// 查询系统管理员
+// 查询系统管理员 by ID
 // 	param id
+//  return SystemAdmin,error
+func (a *SystemAdmin) QuerySystemAdminByID() error {
+	db := mysql.GetMysqlDB()
+	return db.Where("id = ? ", a.ID).First(&a).Error
+}
+
+// 查询系统管理员 by username
 // 	param username
+//  return SystemAdmin,error
+func (a *SystemAdmin) QuerySystemAdminByUsername() error {
+	db := mysql.GetMysqlDB()
+	return db.Where("username = ? ", a.Username).First(&a).Error
+}
+
+// 查询系统管理员 by token
 // 	param token
 //  return SystemAdmin,error
-func (a *SystemAdmin) QuerySystemAdmin() error {
+func (a *SystemAdmin) QuerySystemAdminByToken() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ? OR username = ? OR (token = ? AND token IS NOT NULL)", a.ID, a.Username, a.Token).First(&a).Error
+	return db.Where("token = ? AND ISNULL(token)=0 AND LENGTH(trim(token))>0", a.Token).First(&a).Error
 }
 
 // 批量查询系统管理员

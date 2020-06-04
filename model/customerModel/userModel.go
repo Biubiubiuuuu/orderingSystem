@@ -35,22 +35,28 @@ func (u *User) RegisterUser() error {
 	return db.Create(&u).Error
 }
 
-// 验证手机号是否已注册
-func (u *User) VerificationTelRegistered() error {
+// 查询用户 by ID
+// 	param id
+//  return User,error
+func (u *User) QueryUserByID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("tel = ?", u.Tel).First(&u).Error
+	return db.Where("id = ? ", u.ID).First(&u).Error
 }
 
-// 登录
-func (u *User) Login() error {
+// 查询用户 by tel
+// 	param tel
+//  return User,error
+func (u *User) QueryUserByTel() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("tel = ? AND password = ?", u.Tel, u.Password).First(&u).Error
+	return db.Where("tel = ? ", u.Tel).First(&u).Error
 }
 
-// 查询用户信息
-func (u *User) QueryUser() error {
+// 查询用户 by token
+// 	param token
+//  return User,error
+func (u *User) QueryUserByToken() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ? OR tel = ? OR (token = ? AND token IS NOT NULL)", u.ID, u.Tel, u.Token).First(&u).Error
+	return db.Where("token = ? AND ISNULL(token)=0 AND LENGTH(trim(token))>0", u.Token).First(&u).Error
 }
 
 // 更新用户信息

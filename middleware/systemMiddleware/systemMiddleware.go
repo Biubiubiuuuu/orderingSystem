@@ -24,7 +24,7 @@ func AdminAuth() gin.HandlerFunc {
 			token = strings.TrimSpace(authToken)
 		}
 		a := systemModel.SystemAdmin{Token: token}
-		if err := a.QuerySystemAdmin(); err != nil {
+		if err := a.QuerySystemAdminByToken(); err != nil {
 			message := "操作失败，token错误，未找到系统管理员信息"
 			res := responseCommon.Response(false, nil, message)
 			c.AbortWithStatusJSON(http.StatusOK, res)

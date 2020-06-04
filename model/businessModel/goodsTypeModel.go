@@ -23,21 +23,21 @@ func (g *GoodsType) AddGoodsType() error {
 }
 
 // 修改商品分类
-func (g *GoodsType) UpdateGoodsType(args map[string]interface{}) error {
+func (g *GoodsType) UpdateGoodsTypeByID(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
 	return db.Model(&g).Updates(args).Error
 }
 
 // 查询商品分类
-func (g *GoodsType) QueryGoodsType() error {
+func (g *GoodsType) QueryGoodsTypeByID() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("id = ?", g.ID).First(&g).Error
 }
 
 // 删除商品分类(可批量)
-// 	param id
+// 	param ids
 //  return error
-func (g *GoodsType) DeleteGoodsType(ids []int64) error {
+func (g *GoodsType) DeleteGoodsTypeByIds(ids []int64) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
 	for _, id := range ids {
@@ -55,7 +55,7 @@ func (g *GoodsType) DeleteGoodsType(ids []int64) error {
 }
 
 // 检查商家是否已创建相同的商品分类名称
-func (g *GoodsType) QueryGoodsTypeExistName() error {
+func (g *GoodsType) QueryGoodsTypeExistNameByAdminID() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("name = ? AND admin_id = ?", g.Name, g.AdminID).Error
 }

@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"log"
 	"strconv"
 	"sync"
 	"time"
@@ -40,6 +41,7 @@ func InitRedisConePool() *redis.Pool {
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", host, redis.DialDatabase(db), redis.DialConnectTimeout(time.Duration(idleTimeout)*time.Second))
 			if err != nil {
+				log.Fatal(err)
 				return nil, err
 			}
 			if pass != "" {
