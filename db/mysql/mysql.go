@@ -19,16 +19,16 @@ var DB *MysqlDatabase
 var once sync.Once
 
 // 初始化mysql连接
-func (db *MysqlDatabase) InitCoon() {
+func (db *MysqlDatabase) InitConn() {
 	once.Do(func() {
 		DB = &MysqlDatabase{
-			Mysql: InitMysqlDB(),
+			Mysql: InitMysqlConnPool(),
 		}
 	})
 }
 
 // 初始化mysql连接池
-func InitMysqlDB() *gorm.DB {
+func InitMysqlConnPool() *gorm.DB {
 	var (
 		dbType, dbName, user, password, host, tablePrefix string
 	)
@@ -70,5 +70,5 @@ func SetDBConns(db *gorm.DB) {
 
 // 获取mysql连接池
 func GetMysqlDB() *gorm.DB {
-	return InitMysqlDB()
+	return InitMysqlConnPool()
 }

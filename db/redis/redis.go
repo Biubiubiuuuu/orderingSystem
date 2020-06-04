@@ -13,20 +13,20 @@ type RedisDataBase struct {
 	Redis *redis.Pool
 }
 
-var Pool *RedisDataBase
+var DB *RedisDataBase
 var once sync.Once
 
 // 初始化redis连接
 func (db *RedisDataBase) InitConn() {
 	once.Do(func() {
-		Pool = &RedisDataBase{
-			Redis: InitRedisDB(),
+		DB = &RedisDataBase{
+			Redis: InitRedisConePool(),
 		}
 	})
 }
 
 // 初始化redis连接池
-func InitRedisDB() *redis.Pool {
+func InitRedisConePool() *redis.Pool {
 	host := configHelper.DBRedisHost
 	db, _ := strconv.Atoi(configHelper.DBRedisDb)
 	pass := configHelper.DBRedisPassword
@@ -61,16 +61,11 @@ func InitRedisDB() *redis.Pool {
 }
 
 // 获取redis连接池
-func GetRedisPool() *redis.Pool {
-	return InitRedisDB()
-}
-
-// 初始化redis
-func InitRedis() {
-	Pool.InitConn()
+func GetRedisDB() redis.Conn {
+	return InitRedisConePool().Get()
 }
 
 // 关闭redis
 func CloseRedis() {
-	Pool.Redis.Close()
+	DB.Redis.Close()
 }

@@ -15,7 +15,7 @@ import (
 // @name Authorization
 func main() {
 	//初始化mysql
-	mysql.DB.InitCoon()
+	mysql.DB.InitConn()
 	db := mysql.GetMysqlDB()
 	//自动迁移模型
 	db.AutoMigrate(&systemModel.SystemAdmin{}, &businessModel.BusinessAdmin{})
@@ -25,7 +25,7 @@ func main() {
 		a.AddSystemAdmin()
 	}
 	//初始化redis
-	redis.InitRedis()
+	redis.DB.InitConn()
 	//初始化路由
 	router := router.Init()
 	//启动
