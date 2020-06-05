@@ -153,6 +153,62 @@ paths:
       summary: 查询商家门店信息
       tags:
       - 商家
+    put:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 门店名称
+        in: formData
+        name: store_name
+        required: true
+        type: string
+      - description: 门店详细地址
+        in: formData
+        name: store_address
+        required: true
+        type: string
+      - description: 门店logo
+        in: formData
+        name: store_logo
+        type: file
+      - description: 门店联系人姓名
+        in: formData
+        name: store_contact_name
+        type: string
+      - description: 门店联系人电话
+        in: formData
+        name: store_contact_tel
+        type: string
+      - description: 门店开始营业时间
+        in: formData
+        name: store_start_banking_hours
+        required: true
+        type: string
+      - description: 门店结束营业时间
+        in: formData
+        name: store_end_banking_hours
+        required: true
+        type: string
+      - description: 门脸照
+        in: formData
+        name: store_face_photo
+        type: file
+      - description: 店内照
+        in: formData
+        name: in_store_photos
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新商家门店信息
+      tags:
+      - 商家
   /api/v1/common/verificationcode:
     get:
       consumes:

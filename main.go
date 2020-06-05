@@ -18,7 +18,16 @@ func main() {
 	mysql.DB.InitConn()
 	db := mysql.GetMysqlDB()
 	//自动迁移模型
-	db.AutoMigrate(&systemModel.SystemAdmin{}, &businessModel.BusinessAdmin{})
+	db.AutoMigrate(
+		&systemModel.SystemAdmin{},
+		&businessModel.BusinessAdmin{},
+		&businessModel.Goods{},
+		&businessModel.GoodsType{},
+		&businessModel.Store{},
+		&businessModel.InStorePhoto{},
+		&businessModel.TableSeat{},
+		&businessModel.TableSeatType{},
+	)
 	// 添加默认管理员 username:Admin,password:123456
 	a := systemModel.SystemAdmin{Username: "admin", Password: encryptHelper.EncryptMD5To32Bit("123456"), Manager: "Y"}
 	if err := a.QuerySystemAdminByUsername(); err != nil {

@@ -8,16 +8,16 @@ import (
 // Store model 门店信息
 type Store struct {
 	model.Model
-	StoreName              string         `gorm:"not null" json:"store_name"`                   // 门店名称
-	StoreAddress           string         `gorm:"not null" json:"store_address"`                // 门店详细地址
-	StoreLogo              string         `json:"store_logo"`                                   // 门店logo
-	StoreContactName       string         `json:"store_contact_name"`                           // 门店联系人姓名
-	StoreContactTel        string         `json:"store_contact_tel"`                            // 门店联系人电话
-	StoreStartBankingHours string         `gorm:"not null" json:"store_start_banking_hours"`    // 门店开始营业时间
-	StoreEndBankingHours   string         `gorm:"not null" json:"store_end_banking_hours"`      // 门店结束营业时间
-	StoreFacePhoto         string         `json:"store_face_photo"`                             // 门脸照
-	InStorePhotos          []InStorePhoto `gorm:"foreignkey:StoreID;association_foreignkey:ID"` // 店内照
-	AdminID                int64          `gorm:"INDEX" json:"admin_id"`                        // 商家管理员ID
+	StoreName              string         `gorm:"not null" json:"store_name"`                                          // 门店名称
+	StoreAddress           string         `gorm:"not null" json:"store_address"`                                       // 门店详细地址
+	StoreLogo              string         `json:"store_logo"`                                                          // 门店logo
+	StoreContactName       string         `json:"store_contact_name"`                                                  // 门店联系人姓名
+	StoreContactTel        string         `json:"store_contact_tel"`                                                   // 门店联系人电话
+	StoreStartBankingHours string         `gorm:"not null" json:"store_start_banking_hours"`                           // 门店开始营业时间
+	StoreEndBankingHours   string         `gorm:"not null" json:"store_end_banking_hours"`                             // 门店结束营业时间
+	StoreFacePhoto         string         `json:"store_face_photo"`                                                    // 门脸照
+	InStorePhotos          []InStorePhoto `gorm:"foreignkey:StoreID;association_foreignkey:ID" json:"in_store_photos"` // 店内照
+	AdminID                int64          `gorm:"INDEX" json:"admin_id"`                                               // 商家管理员ID
 }
 
 // 店内照
@@ -36,11 +36,18 @@ func (s *Store) AddStore() error {
 // 修改门店信息
 func (s *Store) UpdateStore(args map[string]interface{}) error {
 	db := mysql.GetMysqlDB()
-	return db.Model(&s).Updates(args).Error
+	db.Model(&s).Association("InStorePhotos").Replace(s.InStorePhotos)
+	return db.Model(&s).Update(args).Error
 }
 
-// 查询门店信息
+// 查询门店信息 by AdminID
 func (s *Store) QueryStoreByAdminID() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("admin_id = ?", s.AdminID).First(&s).Error
+}
+
+// 查询门店信息 by id
+func (s *Store) QueryStoreByID() error {
+	db := mysql.GetMysqlDB()
+	return db.First(&s).Model(&s).Related(&s.InStorePhotos).Find(&s).Error
 }

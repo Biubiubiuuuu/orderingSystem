@@ -45,3 +45,21 @@ type BusinessPassLoginRequest struct {
 	Tel      string `json:"tel"`      // 手机号码
 	Password string `json:"password"` // 密码
 }
+
+// 商家门店信息更新结构体
+type BusinessStoreRequest struct {
+	StoreName              string                             `json:"store_name"`                // 门店名称
+	StoreAddress           string                             `json:"store_address"`             // 门店详细地址
+	StoreLogo              string                             `json:"store_logo"`                // 门店logo
+	StoreContactName       string                             `json:"store_contact_name"`        // 门店联系人姓名
+	StoreContactTel        string                             `json:"store_contact_tel"`         // 门店联系人电话
+	StoreStartBankingHours string                             `json:"store_start_banking_hours"` // 门店开始营业时间
+	StoreEndBankingHours   string                             `json:"store_end_banking_hours"`   // 门店结束营业时间
+	StoreFacePhoto         string                             `json:"store_face_photo"`          // 门脸照
+	InStorePhotos          []BusinessStoreRequestInStorePhoto `json:"in_store_photos"`           // 店内照
+}
+
+type BusinessStoreRequestInStorePhoto struct {
+	Url     string `json:"Url"`      // 图片保存地址
+	StoreID int64  `json:"store_id"` // 门店ID
+}

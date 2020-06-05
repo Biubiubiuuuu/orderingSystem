@@ -165,6 +165,91 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "更新商家门店信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "门店名称",
+                        "name": "store_name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "门店详细地址",
+                        "name": "store_address",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "门店logo",
+                        "name": "store_logo",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "门店联系人姓名",
+                        "name": "store_contact_name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "门店联系人电话",
+                        "name": "store_contact_tel",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "门店开始营业时间",
+                        "name": "store_start_banking_hours",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "门店结束营业时间",
+                        "name": "store_end_banking_hours",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "门脸照",
+                        "name": "store_face_photo",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "店内照",
+                        "name": "in_store_photos",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
             }
         },
         "/api/v1/common/verificationcode": {

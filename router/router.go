@@ -92,5 +92,6 @@ func InitBusiness(router *gin.Engine) {
 	apiS.Use(jwtMiddleware.JWT())
 	{
 		apiS.GET("", businessController.QueryBusinessStoreInfo)
+		apiS.PUT("", businessController.UpdateBusinessStoreInfo)
 	}
 }
