@@ -63,3 +63,10 @@ type BusinessStoreRequestInStorePhoto struct {
 	Url     string `json:"Url"`      // 图片保存地址
 	StoreID int64  `json:"store_id"` // 门店ID
 }
+
+// 商品种类请求结构体
+type GoodsTypeRequest struct {
+	Name         string `json:"name"`           // 分类名称
+	TypeSort     int64  `json:"type_sort"`      // 分类排序
+	DisplayOrNot bool   `json:"display_or_not"` // 是否显示
+}

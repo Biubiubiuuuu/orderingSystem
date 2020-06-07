@@ -2,6 +2,7 @@ package businessController
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/Biubiubiuuuu/orderingSystem/entity"
@@ -205,5 +206,121 @@ func UpdateBusinessStoreInfo(c *gin.Context) {
 		InStorePhotos:          inStorePhotos,
 	}
 	res = businessService.UpdateBusinessStoreInfo(token, req)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 商品种类添加
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param body body entity.GoodsTypeRequest true "body"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goodstype [POST]
+// @Security ApiKeyAuth
+func AddGoodsType(c *gin.Context) {
+	req := entity.GoodsTypeRequest{}
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	if c.ShouldBindJSON(&req) != nil {
+		res.Message = "请求参数json错误"
+	} else {
+		res = businessService.AddGoodsType(token, req)
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 商品种类修改
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "商品种类ID"
+// @Param body body entity.GoodsTypeRequest true "body"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goodstype/{id} [PUT]
+// @Security ApiKeyAuth
+func UpdateGoodsType(c *gin.Context) {
+	req := entity.GoodsTypeRequest{}
+	res := entity.ResponseData{}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	if c.ShouldBindJSON(&req) != nil {
+		res.Message = "请求参数json错误"
+	} else {
+		res = businessService.UpdateGoodsType(token, id, req)
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 商品种类删除
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "商品种类ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goodstype/{id} [DELETE]
+// @Security ApiKeyAuth
+func DeleteGoodsType(c *gin.Context) {
+	req := entity.DeleteIds{}
+	ids := append(req.Ids, c.Param("id"))
+	res := businessService.DeleteGoodsType(ids)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 查询商品种类By ID
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "商品种类ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goodstype/{id} [GET]
+// @Security ApiKeyAuth
+func QueryGoodsTypeByID(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	res := businessService.QueryGoodsTypeByID(id)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 查询商家商品种类
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param pageSize query string false "页大小"
+// @Param page query string false "页数"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goodstype [GET]
+// @Security ApiKeyAuth
+func QueryGoodsType(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "100"))
+	res = businessService.QueryGoodsType(token, pageSize, page)
 	c.JSON(http.StatusOK, res)
 }

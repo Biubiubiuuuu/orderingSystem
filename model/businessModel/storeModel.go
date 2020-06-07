@@ -43,7 +43,7 @@ func (s *Store) UpdateStore(args map[string]interface{}) error {
 // 查询门店信息 by AdminID
 func (s *Store) QueryStoreByAdminID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("admin_id = ?", s.AdminID).First(&s).Error
+	return db.First(&s).Model(&s).Related(&s.InStorePhotos).Where("admin_id = ?", s.AdminID).Find(&s).Error
 }
 
 // 查询门店信息 by id

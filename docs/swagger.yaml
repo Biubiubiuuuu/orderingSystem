@@ -17,6 +17,18 @@ definitions:
         description: 手机号码
         type: string
     type: object
+  entity.GoodsTypeRequest:
+    properties:
+      display_or_not:
+        description: 是否显示
+        type: boolean
+      name:
+        description: 分类名称
+        type: string
+      type_sort:
+        description: 分类排序
+        type: integer
+    type: object
   entity.ResponseData:
     properties:
       data:
@@ -93,6 +105,123 @@ paths:
           schema:
             $ref: '#/definitions/entity.ResponseData'
       summary: 商家手机验证码登录
+      tags:
+      - 商家
+  /api/v1/business/goodstype:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页大小
+        in: query
+        name: pageSize
+        type: string
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询商家商品种类
+      tags:
+      - 商家
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.GoodsTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 商品种类添加
+      tags:
+      - 商家
+  /api/v1/business/goodstype/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 商品种类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 商品种类删除
+      tags:
+      - 商家
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 商品种类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询商品种类By ID
+      tags:
+      - 商家
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 商品种类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.GoodsTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 商品种类修改
       tags:
       - 商家
   /api/v1/business/passlogin:

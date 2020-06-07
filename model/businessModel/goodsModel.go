@@ -62,7 +62,7 @@ func (g *Goods) DeleteGoodsByIds(ids []int64) error {
 // 检查商家是否已创建相同的商品名称
 func (g *Goods) QueryGoodsExistNameByAdminId() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("goods_name = ? AND admin_id = ?", g.GoodsName, g.AdminID).Error
+	return db.Where("goods_name = ? AND admin_id = ?", g.GoodsName, g.AdminID).First(&g).Error
 }
 
 // 批量查询商品

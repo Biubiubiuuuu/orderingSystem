@@ -2,6 +2,7 @@ package businessModel
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
 	"github.com/Biubiubiuuuu/orderingSystem/model"
@@ -37,14 +38,15 @@ func (g *GoodsType) QueryGoodsTypeByID() error {
 // 删除商品分类(可批量)
 // 	param ids
 //  return error
-func (g *GoodsType) DeleteGoodsTypeByIds(ids []int64) error {
+func (g *GoodsType) DeleteGoodsTypeByIds(ids []string) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
 	for _, id := range ids {
-		if id == 0 {
+		if id == "" {
 			return errors.New("id is not 0")
 		}
-		g.ID = id
+		v, _ := strconv.ParseInt(id, 10, 64)
+		g.ID = v
 		if err := tx.Delete(&g).Error; err != nil {
 			tx.Rollback()
 			return err
@@ -57,7 +59,7 @@ func (g *GoodsType) DeleteGoodsTypeByIds(ids []int64) error {
 // 检查商家是否已创建相同的商品分类名称
 func (g *GoodsType) QueryGoodsTypeExistNameByAdminID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("name = ? AND admin_id = ?", g.Name, g.AdminID).Error
+	return db.Where("name = ? AND admin_id = ?", g.Name, g.AdminID).First(&g).Error
 }
 
 // 批量查询商品分类

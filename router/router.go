@@ -88,10 +88,21 @@ func InitBusiness(router *gin.Engine) {
 	api.POST("register", businessController.Register)
 	api.POST("codelogin", businessController.CodeLogin)
 	api.POST("passlogin", businessController.PassLogin)
+	// 门店
 	apiS := router.Group("/api/v1/business/store")
 	apiS.Use(jwtMiddleware.JWT())
 	{
 		apiS.GET("", businessController.QueryBusinessStoreInfo)
 		apiS.PUT("", businessController.UpdateBusinessStoreInfo)
+	}
+	// 商品种类
+	apiGT := router.Group("/api/v1/business/goodstype")
+	apiGT.Use(jwtMiddleware.JWT())
+	{
+		apiGT.POST("", businessController.AddGoodsType)
+		apiGT.GET(":id", businessController.QueryGoodsTypeByID)
+		apiGT.GET("", businessController.QueryGoodsType)
+		apiGT.PUT(":id", businessController.UpdateGoodsType)
+		apiGT.DELETE(":id", businessController.DeleteGoodsType)
 	}
 }

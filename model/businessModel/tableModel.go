@@ -60,7 +60,7 @@ func (t *TableSeat) DeleteTableSeat(ids []int64) error {
 // 检查商家是否已创建相同的餐桌名称
 func (t *TableSeat) QueryTableSeatExistName() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("name = ? AND admin_id = ?", t.Name, t.AdminID).Error
+	return db.Where("name = ? AND admin_id = ?", t.Name, t.AdminID).First(&t).Error
 }
 
 // 批量查询餐桌

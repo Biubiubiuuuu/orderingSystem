@@ -106,7 +106,7 @@ func CodeLogin(req entity.BusinessLoginOrRegisterRequest, ip string) (res entity
 	res.Status = true
 	res.Message = "登录成功"
 	data := make(map[string]interface{})
-	data["user"] = b.QueryUserByToken()
+	data["user"] = b
 	res.Data = data
 	return
 }
@@ -148,7 +148,7 @@ func PassLogin(req entity.BusinessPassLoginRequest, ip string) (res entity.Respo
 	res.Status = true
 	res.Message = "登录成功"
 	data := make(map[string]interface{})
-	data["user"] = b.QueryUserByToken()
+	data["user"] = b
 	res.Data = data
 	return
 }
@@ -162,10 +162,6 @@ func QueryBusinessStoreInfo(token string) (res entity.ResponseData) {
 	}
 	s := businessModel.Store{AdminID: b.ID}
 	if err := s.QueryStoreByAdminID(); err != nil {
-		res.Message = "查询失败，未找到用户门店信息"
-		return
-	}
-	if err := s.QueryStoreByID(); err != nil {
 		res.Message = "查询失败，未找到用户门店信息"
 		return
 	}
@@ -260,4 +256,129 @@ func UpdateBusinessStoreInfo(token string, req entity.BusinessStoreRequest) (res
 	data["store"] = u
 	res.Data = data
 	return
+}
+
+// 添加商品种类
+func AddGoodsType(token string, req entity.GoodsTypeRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.Name == "" {
+		res.Message = "商品种类名称不能为空"
+		return
+	}
+	g := businessModel.GoodsType{
+		Name:         req.Name,
+		TypeSort:     req.TypeSort,
+		DisplayOrNot: req.DisplayOrNot,
+		AdminID:      b.ID,
+	}
+	if err := g.QueryGoodsTypeExistNameByAdminID(); err == nil {
+		res.Message = "添加失败，已存在该商品种类名称"
+		return
+	}
+	if err := g.AddGoodsType(); err != nil {
+		res.Message = "添加失败"
+		return
+	}
+	res.Message = "添加成功"
+	res.Status = true
+	return
+}
+
+// 修改商品种类
+func UpdateGoodsType(token string, id int64, req entity.GoodsTypeRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.Name == "" {
+		res.Message = "商品种类名称不能为空"
+		return
+	}
+	g := businessModel.GoodsType{
+		AdminID: b.ID,
+		Name:    req.Name,
+	}
+	args := map[string]interface{}{
+		"name":           req.Name,
+		"type_sort":      req.TypeSort,
+		"display_or_not": req.DisplayOrNot,
+	}
+	if err := g.QueryGoodsTypeExistNameByAdminID(); err != nil {
+		if err := g.UpdateGoodsTypeByID(args); err != nil {
+			res.Message = "修改失败"
+			return
+		}
+		res.Message = "修改成功"
+		res.Status = true
+		return
+	}
+	if id != g.ID {
+		res.Message = "修改失败，已存在该商品种类名称"
+		return
+	}
+	if err := g.UpdateGoodsTypeByID(args); err != nil {
+		res.Message = "修改失败"
+		return
+	}
+	res.Message = "修改成功"
+	res.Status = true
+	return
+}
+
+// 删除商品种类
+func DeleteGoodsType(ids []string) (res entity.ResponseData) {
+	if len(ids) == 0 {
+		res.Message = "id 不能为空"
+		return
+	}
+	g := businessModel.GoodsType{}
+	if err := g.DeleteGoodsTypeByIds(ids); err != nil {
+		res.Message = "删除失败"
+		return
+	}
+	res.Status = true
+	res.Message = "删除成功"
+	return
+}
+
+// 查询商品种类By ID
+func QueryGoodsTypeByID(id int64) (res entity.ResponseData) {
+	g := businessModel.GoodsType{}
+	g.ID = id
+	if err := g.QueryGoodsTypeByID(); err != nil {
+		res.Message = "查询失败，未找到商品种类信息"
+		return
+	}
+	res.Message = "查询成功"
+	res.Status = true
+	data := make(map[string]interface{})
+	data["goodstype"] = g
+	res.Data = data
+	return
+}
+
+// 查询商家商品种类
+func QueryGoodsType(token string, pageSize int, page int) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	g := businessModel.GoodsType{AdminID: b.ID}
+	if goodsTypes := g.QueryGoodsTypeByAdminID(pageSize, page); len(goodsTypes) == 0 {
+		res.Message = "查询失败，未找到商品种类信息"
+		return
+	} else {
+		res.Message = "查询成功"
+		res.Status = true
+		data := make(map[string]interface{})
+		data["goodstype"] = goodsTypes
+		res.Data = data
+		return
+	}
 }
