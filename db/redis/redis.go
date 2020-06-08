@@ -11,7 +11,7 @@ import (
 )
 
 type RedisDataBase struct {
-	Redis *redis.Pool
+	Redis redis.Conn
 }
 
 var DB *RedisDataBase
@@ -21,20 +21,20 @@ var once sync.Once
 func (db *RedisDataBase) InitConn() {
 	once.Do(func() {
 		DB = &RedisDataBase{
-			Redis: InitRedisConePool(),
+			Redis: InitRedisConnPool(),
 		}
 	})
 }
 
 // 初始化redis连接池
-func InitRedisConePool() *redis.Pool {
+func InitRedisConnPool() redis.Conn {
 	host := configHelper.DBRedisHost
 	db, _ := strconv.Atoi(configHelper.DBRedisDb)
 	pass := configHelper.DBRedisPassword
 	maxActive, _ := strconv.Atoi(configHelper.DBRedisMaxActive)
 	maxIdle, _ := strconv.Atoi(configHelper.DBRedisMaxIdle)
 	idleTimeout, _ := strconv.ParseInt(configHelper.DBRedisIdleTimeout, 10, 64)
-	return &redis.Pool{
+	pool := &redis.Pool{
 		MaxIdle:     maxIdle,
 		MaxActive:   maxActive,
 		IdleTimeout: time.Duration(idleTimeout) * time.Second,
@@ -42,32 +42,31 @@ func InitRedisConePool() *redis.Pool {
 			c, err := redis.Dial("tcp", host, redis.DialDatabase(db), redis.DialConnectTimeout(time.Duration(idleTimeout)*time.Second))
 			if err != nil {
 				log.Fatal(err)
-				return nil, err
 			}
 			if pass != "" {
 				if _, err := c.Do("AUTH", pass); err != nil {
 					c.Close()
-					return nil, err
+					log.Fatal(err)
 				}
 			}
-			return c, err
+			return c, nil
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
 			if time.Since(t) < time.Minute {
 				return nil
 			}
-			_, err := c.Do("PING")
-			return err
+			if _, err := c.Do("PING"); err != nil {
+				log.Fatal(err)
+			}
+			return nil
 		},
 	}
+	conn := pool.Get()
+	defer conn.Close()
+	return conn
 }
 
 // 获取redis连接池
 func GetRedisDB() redis.Conn {
-	return InitRedisConePool().Get()
-}
-
-// 关闭redis
-func CloseRedis() {
-	DB.Redis.Close()
+	return InitRedisConnPool()
 }
