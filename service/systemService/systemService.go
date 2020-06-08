@@ -151,7 +151,7 @@ func IsManagerAdmin(id int64, is_manager string) (res entity.ResponseData) {
 }
 
 // 删除管理员账号
-func DeleteAdmin(ids []string) (res entity.ResponseData) {
+func DeleteAdmin(ids []int64) (res entity.ResponseData) {
 	if len(ids) == 0 {
 		res.Message = "id 不能为空"
 		return

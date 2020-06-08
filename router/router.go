@@ -105,4 +105,21 @@ func InitBusiness(router *gin.Engine) {
 		apiGT.PUT(":id", businessController.UpdateGoodsType)
 		apiGT.DELETE(":id", businessController.DeleteGoodsType)
 	}
+	// 商品种类
+	apiGTS := router.Group("/api/v1/business/goodstypes")
+	apiGTS.Use(jwtMiddleware.JWT())
+	{
+		apiGTS.GET("", businessController.QueryGoodsTypeIDAndName)
+	}
+	// 商品
+	apiG := router.Group("/api/v1/business/goods")
+	apiG.Use(jwtMiddleware.JWT())
+	{
+		apiG.POST("", businessController.AddGoods)
+		apiG.GET(":id", businessController.QueryGoodsByID)
+		apiG.GET("", businessController.QueryGoods)
+		apiG.PUT(":id", businessController.UpdateGoods)
+		apiG.PUT(":id/:downorup", businessController.DownOrUpGoods)
+		apiG.DELETE(":id", businessController.DeleteGoods)
+	}
 }

@@ -379,6 +379,27 @@ func QueryGoodsType(token string, pageSize int, page int) (res entity.ResponseDa
 	}
 }
 
+// 查询商家商品种类
+func QueryGoodsTypeIDAndNameByAdminID(token string) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	g := businessModel.GoodsType{AdminID: b.ID}
+	if goodsTypes := g.QueryGoodsTypeIDAndNameByAdminID(); len(goodsTypes) == 0 {
+		res.Message = "查询失败，未找到商品种类信息"
+		return
+	} else {
+		res.Message = "查询成功"
+		res.Status = true
+		data := make(map[string]interface{})
+		data["goodstype"] = goodsTypes
+		res.Data = data
+		return
+	}
+}
+
 // 添加商品
 func AddGoods(token string, req entity.GoodsRequest) (res entity.ResponseData) {
 	b := businessModel.BusinessAdmin{Token: token}
@@ -486,5 +507,66 @@ func DeleteGoods(ids []int64) (res entity.ResponseData) {
 	}
 	res.Status = true
 	res.Message = "删除成功"
+	return
+}
+
+// 查询商品 by ID
+func QueryGoodsByID(id int64) (res entity.ResponseData) {
+	g := businessModel.Goods{}
+	g.ID = id
+	if err := g.QueryGoodsByID(); err != nil {
+		res.Message = "查询失败，未找到商品信息"
+		return
+	}
+	res.Message = "查询成功"
+	res.Status = true
+	data := make(map[string]interface{})
+	data["goods"] = g
+	res.Data = data
+	return
+}
+
+// 分页查询商家商品
+func QueryGoods(token string, pageSize int, page int) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	g := businessModel.Goods{AdminID: b.ID}
+	if goods := g.QueryGoodsByAdminID(pageSize, page); len(goods) == 0 {
+		res.Message = "查询失败，未找到商品信息"
+		return
+	} else {
+		res.Message = "查询成功"
+		res.Status = true
+		data := make(map[string]interface{})
+		data["goods"] = goods
+		res.Data = data
+		return
+	}
+}
+
+// 上架/下架商品
+func DownOrUpGoods(id int64, downOrup bool) (res entity.ResponseData) {
+	g := businessModel.Goods{}
+	g.ID = id
+	if err := g.QueryGoodsByID(); err != nil {
+		res.Message = "未找到商品信息"
+		return
+	}
+	args := map[string]interface{}{
+		"GoodsListing": downOrup,
+	}
+	message := "上架"
+	if !downOrup {
+		message = "下架"
+	}
+	if err := g.UpdateGoodsByID(args); err != nil {
+		res.Message = fmt.Sprintf("%v%v", message, "失败，未找到商品信息")
+		return
+	}
+	res.Message = fmt.Sprintf("%v%v", message, "成功")
+	res.Status = true
 	return
 }

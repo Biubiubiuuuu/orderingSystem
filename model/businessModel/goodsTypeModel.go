@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
+	"github.com/Biubiubiuuuu/orderingSystem/entity"
 	"github.com/Biubiubiuuuu/orderingSystem/model"
 )
 
@@ -71,5 +72,12 @@ func (g *GoodsType) QueryGoodsTypeByAdminID(pageSize int, page int) (goodsTypes 
 func (g *GoodsType) QueryGoodsTypeCountByAdminID() (count int) {
 	db := mysql.GetMysqlDB()
 	db.Where("admin_id = ?", g.AdminID).Model(&GoodsType{}).Count(&count)
+	return
+}
+
+// 查询商品分类ID和名称
+func (g *GoodsType) QueryGoodsTypeIDAndNameByAdminID() (res []entity.GoodsTypeResponse) {
+	db := mysql.GetMysqlDB()
+	db.Table("goods_type").Select("id, name").Where("deleted_at IS NULL AND admin_id = ?", g.AdminID).Scan(&res)
 	return
 }

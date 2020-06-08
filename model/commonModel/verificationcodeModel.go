@@ -18,6 +18,7 @@ type Verificationcode struct {
 func (v *Verificationcode) AddVerificationcode() error {
 	rs := redis.GetRedisDB()
 	jsonData, _ := json.Marshal(&v)
+	defer rs.Close()
 	if _, err := rs.Do("set", v.Tel, jsonData); err != nil {
 		return err
 	}
@@ -27,6 +28,7 @@ func (v *Verificationcode) AddVerificationcode() error {
 // 获取验证码信息
 func (v *Verificationcode) GetVerificationcode() error {
 	rs := redis.GetRedisDB()
+	defer rs.Close()
 	if o, err := redigo.Bytes(rs.Do("get", v.Tel)); err == nil {
 		json.Unmarshal(o, &v)
 		return nil
@@ -38,5 +40,6 @@ func (v *Verificationcode) GetVerificationcode() error {
 // 删除验证码信息
 func (v *Verificationcode) DeleteVerificationcode() {
 	rs := redis.GetRedisDB()
+	defer rs.Close()
 	rs.Do("DEL", v.Tel)
 }

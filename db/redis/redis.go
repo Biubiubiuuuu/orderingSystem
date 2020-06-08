@@ -34,7 +34,7 @@ func InitRedisConnPool() redis.Conn {
 	maxActive, _ := strconv.Atoi(configHelper.DBRedisMaxActive)
 	maxIdle, _ := strconv.Atoi(configHelper.DBRedisMaxIdle)
 	idleTimeout, _ := strconv.ParseInt(configHelper.DBRedisIdleTimeout, 10, 64)
-	pool := &redis.Pool{
+	pool := redis.Pool{
 		MaxIdle:     maxIdle,
 		MaxActive:   maxActive,
 		IdleTimeout: time.Duration(idleTimeout) * time.Second,
@@ -42,28 +42,27 @@ func InitRedisConnPool() redis.Conn {
 			c, err := redis.Dial("tcp", host, redis.DialDatabase(db), redis.DialConnectTimeout(time.Duration(idleTimeout)*time.Second))
 			if err != nil {
 				log.Fatal(err)
+				return nil, err
 			}
 			if pass != "" {
 				if _, err := c.Do("AUTH", pass); err != nil {
-					c.Close()
 					log.Fatal(err)
+					c.Close()
+					return nil, err
 				}
 			}
-			return c, nil
+			return c, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
 			if time.Since(t) < time.Minute {
 				return nil
 			}
-			if _, err := c.Do("PING"); err != nil {
-				log.Fatal(err)
-			}
-			return nil
+			_, err := c.Do("PING")
+			log.Fatal(err)
+			return err
 		},
 	}
-	conn := pool.Get()
-	defer conn.Close()
-	return conn
+	return pool.Get()
 }
 
 // 获取redis连接池

@@ -174,7 +174,8 @@ func QueryAdmins(c *gin.Context) {
 // @Security ApiKeyAuth
 func DeleteAdmin(c *gin.Context) {
 	req := entity.DeleteIds{}
-	ids := append(req.Ids, c.Param("id"))
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	ids := append(req.Ids, id)
 	res := systemService.DeleteAdmin(ids)
 	c.JSON(http.StatusOK, res)
 }
@@ -183,14 +184,20 @@ func DeleteAdmin(c *gin.Context) {
 // @tags 系统管理员
 // @Accept  application/json
 // @Produce  json
-// @Param ids path int true "Account ID 多个用,分开"
+// @Param ids path string true "Account ID 多个用,分开"
 // @Success 200 {object} entity.ResponseData "desc"
 // @Router /api/v1/admin/admins/{ids} [POST]
 // @Security ApiKeyAuth
 func DeleteAdmins(c *gin.Context) {
 	res := entity.ResponseData{}
-	ids := strings.Split(",", c.Param("ids"))
-	res = systemService.DeleteAdmin(ids)
+	ids := c.Param("ids")
+	idArr := strings.Split(",", ids)
+	var arr []int64
+	for _, v := range idArr {
+		item, _ := strconv.ParseInt(v, 10, 64)
+		arr = append(arr, item)
+	}
+	res = systemService.DeleteAdmin(arr)
 	c.JSON(http.StatusOK, res)
 }
 

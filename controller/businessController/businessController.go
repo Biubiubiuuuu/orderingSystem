@@ -279,7 +279,8 @@ func UpdateGoodsType(c *gin.Context) {
 // @Security ApiKeyAuth
 func DeleteGoodsType(c *gin.Context) {
 	req := entity.DeleteIds{}
-	ids := append(req.Ids, strconv.Parselnt(c.Param("id"), 10, 64))
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	ids := append(req.Ids, id)
 	res := businessService.DeleteGoodsType(ids)
 	c.JSON(http.StatusOK, res)
 }
@@ -298,7 +299,7 @@ func QueryGoodsTypeByID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// @Summary 查询商家商品种类
+// @Summary 分页查询商家商品种类
 // @tags 商家
 // @Accept  application/json
 // @Produce  json
@@ -322,5 +323,248 @@ func QueryGoodsType(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "100"))
 	res = businessService.QueryGoodsType(token, pageSize, page)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 查询商家商品种类ID和名称
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goodstypes [GET]
+// @Security ApiKeyAuth
+func QueryGoodsTypeIDAndName(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	res = businessService.QueryGoodsTypeIDAndNameByAdminID(token)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 添加商品
+// @tags 商家
+// @Accept  multipart/form-data
+// @Produce  json
+// @Param goods_name formData string true "商品名称"
+// @Param goods_photo formData file string "商品图片"
+// @Param goods_description formData string false "商品描述"
+// @Param goods_listing formData bool false "是否上架"
+// @Param goods_price formData float64 false "商品价格"
+// @Param goods_unit formData string true "商品单位 份、杯、瓶"
+// @Param goods_sort formData string true "排序"
+// @Param goods_type_id formData int false "商品种类ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goods [POST]
+// @Security ApiKeyAuth
+func AddGoods(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	// 获取主机头
+	r := c.Request
+	host := r.Host
+	if strings.HasPrefix(host, "http://") == false {
+		host = "http://" + host
+	}
+	// 商品图片
+	var goods_photo string
+	if file, err := c.FormFile("goods_photo"); err == nil {
+		// 文件名 避免重复取uuid
+		var filename string
+		uuid, _ := uuid.NewUUID()
+		arr := strings.Split(file.Filename, ".")
+		if strings.EqualFold(arr[1], "png") {
+			filename = uuid.String() + ".png"
+		} else {
+			filename = uuid.String() + ".jpg"
+		}
+		pathFile := configHelper.ImageDir
+		if !fileHelper.IsExist(pathFile) {
+			fileHelper.CreateDir(pathFile)
+		}
+		pathFile = pathFile + filename
+		if err := c.SaveUploadedFile(file, pathFile); err == nil {
+			goods_photo = host + "/" + pathFile
+		}
+	}
+	goods_listing, _ := strconv.ParseBool(c.DefaultPostForm("goods_listing", "false"))
+	goods_price, _ := strconv.ParseFloat(c.PostForm("goods_price"), 64)
+	goods_sort, _ := strconv.ParseInt(c.PostForm("goods_sort"), 10, 64)
+	goods_type_id, _ := strconv.ParseInt(c.PostForm("goods_type_id"), 10, 64)
+	req := entity.GoodsRequest{
+		GoodsName:        c.PostForm("goods_name"),
+		GoodsPhoto:       goods_photo,
+		GoodsDescription: c.PostForm("goods_description"),
+		GoodsListing:     goods_listing,
+		GoodsPrice:       goods_price,
+		GoodsUnit:        c.PostForm("goods_unit"),
+		GoodsSort:        goods_sort,
+		GoodsTypeID:      goods_type_id,
+	}
+	res = businessService.AddGoods(token, req)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 修改商品
+// @tags 商家
+// @Accept  multipart/form-data
+// @Produce  json
+// @Param id path int true "商品ID"
+// @Param goods_name formData string true "商品名称"
+// @Param goods_photo formData file string "商品图片"
+// @Param goods_description formData string false "商品描述"
+// @Param goods_listing formData bool false "是否上架"
+// @Param goods_price formData float64 false "商品价格"
+// @Param goods_unit formData string true "商品单位 份、杯、瓶"
+// @Param goods_sort formData string true "排序"
+// @Param goods_type_id formData int false "商品种类ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goods/{id} [PUT]
+// @Security ApiKeyAuth
+func UpdateGoods(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	// 获取主机头
+	r := c.Request
+	host := r.Host
+	if strings.HasPrefix(host, "http://") == false {
+		host = "http://" + host
+	}
+	// 商品图片
+	var goods_photo string
+	if file, err := c.FormFile("goods_photo"); err == nil {
+		// 文件名 避免重复取uuid
+		var filename string
+		uuid, _ := uuid.NewUUID()
+		arr := strings.Split(file.Filename, ".")
+		if strings.EqualFold(arr[1], "png") {
+			filename = uuid.String() + ".png"
+		} else {
+			filename = uuid.String() + ".jpg"
+		}
+		pathFile := configHelper.ImageDir
+		if !fileHelper.IsExist(pathFile) {
+			fileHelper.CreateDir(pathFile)
+		}
+		pathFile = pathFile + filename
+		if err := c.SaveUploadedFile(file, pathFile); err == nil {
+			goods_photo = host + "/" + pathFile
+		}
+	}
+	goods_listing, _ := strconv.ParseBool(c.DefaultPostForm("goods_listing", "false"))
+	goods_price, _ := strconv.ParseFloat(c.PostForm("goods_price"), 64)
+	goods_sort, _ := strconv.ParseInt(c.PostForm("goods_sort"), 10, 64)
+	goods_type_id, _ := strconv.ParseInt(c.PostForm("goods_type_id"), 10, 64)
+	req := entity.GoodsRequest{
+		GoodsName:        c.PostForm("goods_name"),
+		GoodsPhoto:       goods_photo,
+		GoodsDescription: c.PostForm("goods_description"),
+		GoodsListing:     goods_listing,
+		GoodsPrice:       goods_price,
+		GoodsUnit:        c.PostForm("goods_unit"),
+		GoodsSort:        goods_sort,
+		GoodsTypeID:      goods_type_id,
+	}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	res = businessService.UpdateGoods(token, id, req)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 商品删除
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "商品ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goods/{id} [DELETE]
+// @Security ApiKeyAuth
+func DeleteGoods(c *gin.Context) {
+	req := entity.DeleteIds{}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	ids := append(req.Ids, id)
+	res := businessService.DeleteGoods(ids)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 查询商品By ID
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "商品ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goods/{id} [GET]
+// @Security ApiKeyAuth
+func QueryGoodsByID(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	res := businessService.QueryGoodsByID(id)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 分页查询商家商品
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param pageSize query string false "页大小"
+// @Param page query string false "页数"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goods [GET]
+// @Security ApiKeyAuth
+func QueryGoods(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "100"))
+	res = businessService.QueryGoods(token, pageSize, page)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 上架/下架商品
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "商品ID"
+// @Param downorup path bool false "是否上架"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/goods/{id}/{downorup} [PUT]
+// @Security ApiKeyAuth
+func DownOrUpGoods(c *gin.Context) {
+	res := entity.ResponseData{}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	downOrup, _ := strconv.ParseBool(c.Param("downorup"))
+	res = businessService.DownOrUpGoods(id, downOrup)
 	c.JSON(http.StatusOK, res)
 }

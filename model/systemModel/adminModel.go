@@ -2,7 +2,6 @@ package systemModel
 
 import (
 	"errors"
-	"strconv"
 	"time"
 
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
@@ -49,15 +48,14 @@ func (a *SystemAdmin) UpdateSystemAdmin(args map[string]interface{}) error {
 // 删除系统管理员(可批量)
 // 	param id
 //  return error
-func (a *SystemAdmin) DeleteSystemAdmin(ids []string) error {
+func (a *SystemAdmin) DeleteSystemAdmin(ids []int64) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
 	for _, id := range ids {
-		if id == "" {
+		if id == 0 {
 			return errors.New("id is not 0")
 		}
-		v, _ := strconv.ParseInt(id, 10, 64)
-		a.ID = v
+		a.ID = id
 		if err := tx.Delete(&a).Error; err != nil {
 			tx.Rollback()
 			return err

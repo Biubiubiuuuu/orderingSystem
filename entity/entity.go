@@ -82,3 +82,9 @@ type GoodsRequest struct {
 	GoodsSort        int64   `json:"goods_sort"`        // 商品排序
 	GoodsTypeID      int64   `json:"goods_type_id"`     // 商品种类ID
 }
+
+// 商品种类结构体
+type GoodsTypeResponse struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"` // 分类名称
+}

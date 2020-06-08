@@ -73,7 +73,7 @@ paths:
         in: path
         name: ids
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -107,6 +107,207 @@ paths:
       summary: 商家手机验证码登录
       tags:
       - 商家
+  /api/v1/business/goods:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页大小
+        in: query
+        name: pageSize
+        type: string
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 分页查询商家商品
+      tags:
+      - 商家
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 商品名称
+        in: formData
+        name: goods_name
+        required: true
+        type: string
+      - description: 商品图片
+        in: formData
+        name: goods_photo
+        type: file
+      - description: 商品描述
+        in: formData
+        name: goods_description
+        type: string
+      - description: 是否上架
+        in: formData
+        name: goods_listing
+        type: boolean
+      - description: 商品价格
+        in: formData
+        name: goods_price
+        type: number
+      - description: 商品单位 份、杯、瓶
+        in: formData
+        name: goods_unit
+        required: true
+        type: string
+      - description: 排序
+        in: formData
+        name: goods_sort
+        required: true
+        type: string
+      - description: 商品种类ID
+        in: formData
+        name: goods_type_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 添加商品
+      tags:
+      - 商家
+  /api/v1/business/goods/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 商品删除
+      tags:
+      - 商家
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询商品By ID
+      tags:
+      - 商家
+    put:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 商品名称
+        in: formData
+        name: goods_name
+        required: true
+        type: string
+      - description: 商品图片
+        in: formData
+        name: goods_photo
+        type: file
+      - description: 商品描述
+        in: formData
+        name: goods_description
+        type: string
+      - description: 是否上架
+        in: formData
+        name: goods_listing
+        type: boolean
+      - description: 商品价格
+        in: formData
+        name: goods_price
+        type: number
+      - description: 商品单位 份、杯、瓶
+        in: formData
+        name: goods_unit
+        required: true
+        type: string
+      - description: 排序
+        in: formData
+        name: goods_sort
+        required: true
+        type: string
+      - description: 商品种类ID
+        in: formData
+        name: goods_type_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改商品
+      tags:
+      - 商家
+  /api/v1/business/goods/{id}/{downorup}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 商品ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 是否上架
+        in: path
+        name: downorup
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 上架/下架商品
+      tags:
+      - 商家
   /api/v1/business/goodstype:
     get:
       consumes:
@@ -129,7 +330,7 @@ paths:
             $ref: '#/definitions/entity.ResponseData'
       security:
       - ApiKeyAuth: []
-      summary: 查询商家商品种类
+      summary: 分页查询商家商品种类
       tags:
       - 商家
     post:
@@ -222,6 +423,22 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 商品种类修改
+      tags:
+      - 商家
+  /api/v1/business/goodstypes:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询商家商品种类ID和名称
       tags:
       - 商家
   /api/v1/business/passlogin:
