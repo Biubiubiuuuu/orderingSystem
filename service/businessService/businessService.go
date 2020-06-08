@@ -1,6 +1,7 @@
 package businessService
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Biubiubiuuuu/orderingSystem/entity"
@@ -224,25 +225,7 @@ func UpdateBusinessStoreInfo(token string, req entity.BusinessStoreRequest) (res
 		"StoreEndBankingHours":   req.StoreEndBankingHours,
 		"StoreFacePhoto":         req.StoreFacePhoto,
 		"AdminID":                b.ID,
-	}
-	// 存在修改值为 "" 时，先删除该key
-	for k, v := range args {
-		switch v.(type) {
-		case string:
-			if v.(string) == "" {
-				delete(args, k)
-			}
-		}
-	}
-	if len(req.InStorePhotos) > 0 {
-		var photos []businessModel.InStorePhoto
-		for _, k := range req.InStorePhotos {
-			photo := businessModel.InStorePhoto{
-				Url: k.Url,
-			}
-			photos = append(photos, photo)
-		}
-		args["InStorePhotos"] = photos
+		"InStorePhotos":          req.InStorePhotos,
 	}
 	u := businessModel.Store{}
 	u.ID = s.ID
@@ -331,13 +314,26 @@ func UpdateGoodsType(token string, id int64, req entity.GoodsTypeRequest) (res e
 }
 
 // 删除商品种类
-func DeleteGoodsType(ids []string) (res entity.ResponseData) {
+func DeleteGoodsType(ids []int64) (res entity.ResponseData) {
 	if len(ids) == 0 {
 		res.Message = "id 不能为空"
 		return
 	}
-	g := businessModel.GoodsType{}
-	if err := g.DeleteGoodsTypeByIds(ids); err != nil {
+	var count int
+	for _, v := range ids {
+		g := businessModel.Goods{
+			GoodsTypeID: v,
+		}
+		if arrGoods := g.QueryGoodsByGoodsTypeID(); len(arrGoods) > 0 {
+			count += len(arrGoods)
+		}
+	}
+	if count > 0 {
+		res.Message = fmt.Sprintf("该商品种类下有%v个商品，无法删除改商品分类", count)
+		return
+	}
+	gt := businessModel.GoodsType{}
+	if err := gt.DeleteGoodsTypeByIds(ids); err != nil {
 		res.Message = "删除失败"
 		return
 	}
@@ -381,4 +377,114 @@ func QueryGoodsType(token string, pageSize int, page int) (res entity.ResponseDa
 		res.Data = data
 		return
 	}
+}
+
+// 添加商品
+func AddGoods(token string, req entity.GoodsRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.GoodsName == "" {
+		res.Message = "商品名称不能为空"
+		return
+	}
+	gt := businessModel.GoodsType{}
+	gt.ID = req.GoodsTypeID
+	if err := gt.QueryGoodsTypeByID(); err != nil {
+		res.Message = "添加失败，不存在该商品种类"
+		return
+	}
+	g := businessModel.Goods{
+		GoodsName:        req.GoodsName,
+		GoodsPhoto:       req.GoodsPhoto,
+		GoodsDescription: req.GoodsDescription,
+		GoodsListing:     req.GoodsListing,
+		GoodsPrice:       req.GoodsPrice,
+		GoodsUnit:        req.GoodsUnit,
+		GoodsSort:        req.GoodsSort,
+		GoodsTypeID:      req.GoodsTypeID,
+		AdminID:          b.ID,
+	}
+	if err := g.QueryGoodsExistNameByAdminId(); err == nil {
+		res.Message = "添加失败，已存在该商品名称"
+		return
+	}
+	if err := g.AddGoods(); err != nil {
+		res.Message = "添加失败"
+		return
+	}
+	res.Message = "添加成功"
+	res.Status = true
+	return
+}
+
+// 修改商品
+func UpdateGoods(token string, id int64, req entity.GoodsRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.GoodsName == "" {
+		res.Message = "商品名称不能为空"
+		return
+	}
+	gt := businessModel.GoodsType{}
+	gt.ID = req.GoodsTypeID
+	if err := gt.QueryGoodsTypeByID(); err != nil {
+		res.Message = "添加失败，不存在该商品种类"
+		return
+	}
+	g := businessModel.Goods{
+		AdminID:   b.ID,
+		GoodsName: req.GoodsName,
+	}
+	args := map[string]interface{}{
+		"goods_name":        req.GoodsName,
+		"goods_photo":       req.GoodsPhoto,
+		"goods_description": req.GoodsDescription,
+		"goods_listing":     req.GoodsListing,
+		"goods_price":       req.GoodsPrice,
+		"goods_unit":        req.GoodsUnit,
+		"goods_sort":        req.GoodsSort,
+		"goods_type_id":     req.GoodsTypeID,
+	}
+	if err := g.QueryGoodsExistNameByAdminId(); err != nil {
+		if err := g.UpdateGoodsByID(args); err != nil {
+			res.Message = "修改失败"
+			return
+		}
+		res.Message = "修改成功"
+		res.Status = true
+		return
+	}
+	if id != g.ID {
+		res.Message = "修改失败，已存在该商品种类名称"
+		return
+	}
+	if err := g.UpdateGoodsByID(args); err != nil {
+		res.Message = "修改失败"
+		return
+	}
+	res.Message = "修改成功"
+	res.Status = true
+	return
+}
+
+// 删除商品
+func DeleteGoods(ids []int64) (res entity.ResponseData) {
+	if len(ids) == 0 {
+		res.Message = "id 不能为空"
+		return
+	}
+	g := businessModel.Goods{}
+	if err := g.DeleteGoodsByIds(ids); err != nil {
+		res.Message = "删除失败"
+		return
+	}
+	res.Status = true
+	res.Message = "删除成功"
+	return
 }

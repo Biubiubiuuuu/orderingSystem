@@ -2,7 +2,6 @@ package businessModel
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
 	"github.com/Biubiubiuuuu/orderingSystem/model"
@@ -38,15 +37,14 @@ func (g *GoodsType) QueryGoodsTypeByID() error {
 // 删除商品分类(可批量)
 // 	param ids
 //  return error
-func (g *GoodsType) DeleteGoodsTypeByIds(ids []string) error {
+func (g *GoodsType) DeleteGoodsTypeByIds(ids []int64) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
 	for _, id := range ids {
-		if id == "" {
+		if id == 0 {
 			return errors.New("id is not 0")
 		}
-		v, _ := strconv.ParseInt(id, 10, 64)
-		g.ID = v
+		g.ID = id
 		if err := tx.Delete(&g).Error; err != nil {
 			tx.Rollback()
 			return err

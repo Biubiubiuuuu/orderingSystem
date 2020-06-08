@@ -279,7 +279,7 @@ func UpdateGoodsType(c *gin.Context) {
 // @Security ApiKeyAuth
 func DeleteGoodsType(c *gin.Context) {
 	req := entity.DeleteIds{}
-	ids := append(req.Ids, c.Param("id"))
+	ids := append(req.Ids, strconv.Parselnt(c.Param("id"), 10, 64))
 	res := businessService.DeleteGoodsType(ids)
 	c.JSON(http.StatusOK, res)
 }

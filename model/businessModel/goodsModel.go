@@ -33,6 +33,13 @@ func (g *Goods) UpdateGoodsByID(args map[string]interface{}) error {
 	return db.Model(&g).Updates(args).Error
 }
 
+// 查询商品by goods_type_id
+func (g *Goods) QueryGoodsByGoodsTypeID() (goods []Goods) {
+	db := mysql.GetMysqlDB()
+	db.Where("goods_type_id = ?", g.GoodsTypeID).Find(&goods)
+	return 
+}
+
 // 查询商品by id
 func (g *Goods) QueryGoodsByID() error {
 	db := mysql.GetMysqlDB()
@@ -60,6 +67,8 @@ func (g *Goods) DeleteGoodsByIds(ids []int64) error {
 }
 
 // 检查商家是否已创建相同的商品名称
+//  param goods_name
+//  param admin_id
 func (g *Goods) QueryGoodsExistNameByAdminId() error {
 	db := mysql.GetMysqlDB()
 	return db.Where("goods_name = ? AND admin_id = ?", g.GoodsName, g.AdminID).First(&g).Error

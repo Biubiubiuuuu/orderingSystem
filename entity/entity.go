@@ -31,7 +31,7 @@ type SystemAdminUpdatePassRequest struct {
 
 // 删除ids
 type DeleteIds struct {
-	Ids []string `json:"ids"` // ids
+	Ids []int64 `json:"ids"` // ids
 }
 
 // 商家注册请求、手机验证码登录结构体
@@ -69,4 +69,16 @@ type GoodsTypeRequest struct {
 	Name         string `json:"name"`           // 分类名称
 	TypeSort     int64  `json:"type_sort"`      // 分类排序
 	DisplayOrNot bool   `json:"display_or_not"` // 是否显示
+}
+
+// 商品请求结构体
+type GoodsRequest struct {
+	GoodsName        string  `json:"goods_name"`        // 商品名称
+	GoodsPhoto       string  `json:"goods_photo"`       // 商品图片
+	GoodsDescription string  `json:"goods_description"` // 商品描述
+	GoodsListing     bool    `json:"goods_listing"`     // 是否上架
+	GoodsPrice       float64 `json:"goods_price"`       // 商品价格
+	GoodsUnit        string  `json:"goods_unit"`        // 商品单位 份、杯
+	GoodsSort        int64   `json:"goods_sort"`        // 商品排序
+	GoodsTypeID      int64   `json:"goods_type_id"`     // 商品种类ID
 }
