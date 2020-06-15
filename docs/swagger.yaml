@@ -23,10 +23,10 @@ definitions:
         description: 是否显示
         type: boolean
       name:
-        description: 分类名称
+        description: 种类名称
         type: string
       type_sort:
-        description: 分类排序
+        description: 种类排序
         type: integer
     type: object
   entity.ResponseData:
@@ -59,6 +59,21 @@ definitions:
       old_password:
         description: 旧密码
         type: string
+    type: object
+  entity.TableTypeRequest:
+    properties:
+      display_or_not:
+        description: 是否显示
+        type: boolean
+      name:
+        description: 种类名称
+        type: string
+      seating_max:
+        description: 最多可坐人数
+        type: integer
+      seating_min:
+        description: 最少可坐人数
+        type: integer
     type: object
 info:
   contact: {}
@@ -553,6 +568,118 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 更新商家门店信息
+      tags:
+      - 商家
+  /api/v1/business/tabletype:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页大小
+        in: query
+        name: pageSize
+        type: string
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 分页查询餐桌
+      tags:
+      - 商家
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TableTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 添加餐桌种类
+      tags:
+      - 商家
+  /api/v1/business/tabletype/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 餐桌种类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除餐桌种类
+      tags:
+      - 商家
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 餐桌种类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TableTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改餐桌种类
+      tags:
+      - 商家
+  /api/v1/business/tabletypes:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+      security:
+      - ApiKeyAuth: []
+      summary: 查询餐桌种类ID和名称
       tags:
       - 商家
   /api/v1/common/verificationcode:

@@ -122,4 +122,19 @@ func InitBusiness(router *gin.Engine) {
 		apiG.PUT(":id/:downorup", businessController.DownOrUpGoods)
 		apiG.DELETE(":id", businessController.DeleteGoods)
 	}
+	// 餐桌种类
+	apiTT := router.Group("/api/v1/business/tabletype")
+	apiTT.Use(jwtMiddleware.JWT())
+	{
+		apiTT.POST("", businessController.AddTableType)
+		apiTT.GET("", businessController.QueryTableType)
+		apiTT.PUT(":id", businessController.UpdateTableType)
+		apiTT.DELETE(":id", businessController.DeleteTableType)
+	}
+	// 餐桌种类
+	apiTTS := router.Group("/api/v1/business/tabletypes")
+	apiTTS.Use(jwtMiddleware.JWT())
+	{
+		apiTTS.GET("", businessController.QueryTableTypeIDAndName)
+	}
 }

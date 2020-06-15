@@ -66,8 +66,8 @@ type BusinessStoreRequestInStorePhoto struct {
 
 // 商品种类请求结构体
 type GoodsTypeRequest struct {
-	Name         string `json:"name"`           // 分类名称
-	TypeSort     int64  `json:"type_sort"`      // 分类排序
+	Name         string `json:"name"`           // 种类名称
+	TypeSort     int64  `json:"type_sort"`      // 种类排序
 	DisplayOrNot bool   `json:"display_or_not"` // 是否显示
 }
 
@@ -86,5 +86,27 @@ type GoodsRequest struct {
 // 商品种类结构体
 type GoodsTypeResponse struct {
 	ID   int64  `json:"id"`
-	Name string `json:"name"` // 分类名称
+	Name string `json:"name"` // 种类名称
+}
+
+// 餐桌种类请求结构体
+type TableTypeRequest struct {
+	Name         string `json:"name"`           // 种类名称
+	SeatingMin   int64  `json:"seating_min"`    // 最少可坐人数
+	SeatingMax   int64  `json:"seating_max"`    // 最多可坐人数
+	DisplayOrNot bool   `json:"display_or_not"` // 是否显示
+}
+
+// 餐桌请求结构体
+type TableRequest struct {
+	Name         string `json:"name"`           // 餐桌名称
+	Sort         int64  `json:"sort"`           // 餐桌排序
+	DisplayOrNot bool   `json:"display_or_not"` // 是否显示
+	TableTypeID  int64  `json:"table_type_id"`  // 餐桌种类ID
+}
+
+// 餐桌种类结构体
+type TableTypeResponse struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"` // 种类名称
 }

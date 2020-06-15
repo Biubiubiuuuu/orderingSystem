@@ -25,8 +25,8 @@ func main() {
 		&businessModel.GoodsType{},
 		&businessModel.Store{},
 		&businessModel.InStorePhoto{},
-		&businessModel.TableSeat{},
-		&businessModel.TableSeatType{},
+		&businessModel.Table{},
+		&businessModel.TableType{},
 	)
 	// 添加默认管理员 username:Admin,password:123456
 	a := systemModel.SystemAdmin{Username: "admin", Password: encryptHelper.EncryptMD5To32Bit("123456"), Manager: "Y"}

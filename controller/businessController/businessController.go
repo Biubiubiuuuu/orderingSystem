@@ -281,7 +281,18 @@ func DeleteGoodsType(c *gin.Context) {
 	req := entity.DeleteIds{}
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	ids := append(req.Ids, id)
-	res := businessService.DeleteGoodsType(ids)
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	res = businessService.DeleteGoodsType(token, ids)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -507,7 +518,18 @@ func DeleteGoods(c *gin.Context) {
 	req := entity.DeleteIds{}
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	ids := append(req.Ids, id)
-	res := businessService.DeleteGoods(ids)
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	res = businessService.DeleteGoods(token, ids)
 	c.JSON(http.StatusOK, res)
 }
 
@@ -566,5 +588,142 @@ func DownOrUpGoods(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	downOrup, _ := strconv.ParseBool(c.Param("downorup"))
 	res = businessService.DownOrUpGoods(id, downOrup)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 添加餐桌种类
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param body body entity.TableTypeRequest true "body"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/tabletype [POST]
+// @Security ApiKeyAuth
+func AddTableType(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	req := entity.TableTypeRequest{}
+	if c.ShouldBindJSON(&req) != nil {
+		res.Message = "请求参数json错误"
+	} else {
+		res = businessService.AddTableType(token, req)
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 修改餐桌种类
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "餐桌种类ID"
+// @Param body body entity.TableTypeRequest true "body"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/tabletype/{id} [PUT]
+// @Security ApiKeyAuth
+func UpdateTableType(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	req := entity.TableTypeRequest{}
+	if c.ShouldBindJSON(&req) != nil {
+		res.Message = "请求参数json错误"
+	} else {
+		res = businessService.UpdateTableType(token, id, req)
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 删除餐桌种类
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param id path int true "餐桌种类ID"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/tabletype/{id} [DELETE]
+// @Security ApiKeyAuth
+func DeleteTableType(c *gin.Context) {
+	req := entity.DeleteIds{}
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	ids := append(req.Ids, id)
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	res = businessService.DeleteTableType(token, ids)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 查询餐桌种类ID和名称
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/tabletypes [GET]
+// @Security ApiKeyAuth
+func QueryTableTypeIDAndName(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	res = businessService.QueryTableTypeIDAndNameByAdminID(token)
+	c.JSON(http.StatusOK, res)
+}
+
+// @Summary 分页查询餐桌
+// @tags 商家
+// @Accept  application/json
+// @Produce  json
+// @Param pageSize query string false "页大小"
+// @Param page query string false "页数"
+// @Success 200 {object} entity.ResponseData "desc"
+// @Router /api/v1/business/tabletype [GET]
+// @Security ApiKeyAuth
+func QueryTableType(c *gin.Context) {
+	res := entity.ResponseData{}
+	token := c.Query("token")
+	if token == "" {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			res.Message = "Query not 'token' param OR header Authorization has not Bearer token"
+			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
+			return
+		}
+		token = strings.TrimSpace(authToken)
+	}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "100"))
+	res = businessService.QueryTableType(token, pageSize, page)
 	c.JSON(http.StatusOK, res)
 }

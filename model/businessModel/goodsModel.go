@@ -1,8 +1,6 @@
 package businessModel
 
 import (
-	"errors"
-
 	"github.com/Biubiubiuuuu/orderingSystem/db/mysql"
 	"github.com/Biubiubiuuuu/orderingSystem/model"
 )
@@ -18,6 +16,7 @@ type Goods struct {
 	GoodsUnit        string  `json:"goods_unit"`            // 商品单位 份、杯
 	GoodsSort        int64   `json:"goods_sort"`            // 商品排序
 	GoodsTypeID      int64   `json:"goods_type_id"`         // 商品种类ID
+	GoodsTypeName    string  `json:"goods_type_name"`       // 商品种类名称
 	AdminID          int64   `gorm:"INDEX" json:"admin_id"` // 商家管理员ID
 }
 
@@ -37,7 +36,7 @@ func (g *Goods) UpdateGoodsByID(args map[string]interface{}) error {
 func (g *Goods) QueryGoodsByGoodsTypeID() (goods []Goods) {
 	db := mysql.GetMysqlDB()
 	db.Where("goods_type_id = ?", g.GoodsTypeID).Find(&goods)
-	return 
+	return
 }
 
 // 查询商品by id
@@ -46,21 +45,15 @@ func (g *Goods) QueryGoodsByID() error {
 	return db.Where("id = ?", g.ID).First(&g).Error
 }
 
-// 删除商品(可批量)
+// 删除商品
 // 	param ids
 //  return error
 func (g *Goods) DeleteGoodsByIds(ids []int64) error {
 	db := mysql.GetMysqlDB()
 	tx := db.Begin()
-	for _, id := range ids {
-		if id == 0 {
-			return errors.New("id is not 0")
-		}
-		g.ID = id
-		if err := tx.Delete(&g).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
+	if err := tx.Where("admin_id = ? AND id IN (?)", g.AdminID, ids).Delete(&Goods{}).Error; err != nil {
+		tx.Rollback()
+		return err
 	}
 	tx.Commit()
 	return nil

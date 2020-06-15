@@ -785,6 +785,189 @@
                 }
             }
         },
+        "/api/v1/business/tabletype": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "分页查询餐桌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "页大小",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "页数",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "添加餐桌种类",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.TableTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/business/tabletype/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "修改餐桌种类",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "餐桌种类ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.TableTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "删除餐桌种类",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "餐桌种类ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/business/tabletypes": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "查询餐桌种类ID和名称",
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/common/verificationcode": {
             "get": {
                 "consumes": [
@@ -1300,11 +1483,11 @@
                     "type": "boolean"
                 },
                 "name": {
-                    "description": "分类名称",
+                    "description": "种类名称",
                     "type": "string"
                 },
                 "type_sort": {
-                    "description": "分类排序",
+                    "description": "种类排序",
                     "type": "integer"
                 }
             }
@@ -1350,6 +1533,27 @@
                 "old_password": {
                     "description": "旧密码",
                     "type": "string"
+                }
+            }
+        },
+        "entity.TableTypeRequest": {
+            "type": "object",
+            "properties": {
+                "display_or_not": {
+                    "description": "是否显示",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "种类名称",
+                    "type": "string"
+                },
+                "seating_max": {
+                    "description": "最多可坐人数",
+                    "type": "integer"
+                },
+                "seating_min": {
+                    "description": "最少可坐人数",
+                    "type": "integer"
                 }
             }
         }

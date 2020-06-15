@@ -292,6 +292,7 @@ func UpdateGoodsType(token string, id int64, req entity.GoodsTypeRequest) (res e
 		"display_or_not": req.DisplayOrNot,
 	}
 	if err := g.QueryGoodsTypeExistNameByAdminID(); err != nil {
+		g.ID = id
 		if err := g.UpdateGoodsTypeByID(args); err != nil {
 			res.Message = "修改失败"
 			return
@@ -314,9 +315,14 @@ func UpdateGoodsType(token string, id int64, req entity.GoodsTypeRequest) (res e
 }
 
 // 删除商品种类
-func DeleteGoodsType(ids []int64) (res entity.ResponseData) {
+func DeleteGoodsType(token string, ids []int64) (res entity.ResponseData) {
 	if len(ids) == 0 {
 		res.Message = "id 不能为空"
+		return
+	}
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
 		return
 	}
 	var count int
@@ -329,10 +335,12 @@ func DeleteGoodsType(ids []int64) (res entity.ResponseData) {
 		}
 	}
 	if count > 0 {
-		res.Message = fmt.Sprintf("该商品种类下有%v个商品，无法删除改商品分类", count)
+		res.Message = fmt.Sprintf("该商品种类下有%v个商品，无法删除改商品种类", count)
 		return
 	}
-	gt := businessModel.GoodsType{}
+	gt := businessModel.GoodsType{
+		AdminID: b.ID,
+	}
 	if err := gt.DeleteGoodsTypeByIds(ids); err != nil {
 		res.Message = "删除失败"
 		return
@@ -379,7 +387,7 @@ func QueryGoodsType(token string, pageSize int, page int) (res entity.ResponseDa
 	}
 }
 
-// 查询商家商品种类
+// 查询商家商品种类ID和名称
 func QueryGoodsTypeIDAndNameByAdminID(token string) (res entity.ResponseData) {
 	b := businessModel.BusinessAdmin{Token: token}
 	if err := b.QueryUserByToken(); err != nil {
@@ -426,6 +434,7 @@ func AddGoods(token string, req entity.GoodsRequest) (res entity.ResponseData) {
 		GoodsUnit:        req.GoodsUnit,
 		GoodsSort:        req.GoodsSort,
 		GoodsTypeID:      req.GoodsTypeID,
+		GoodsTypeName:    gt.Name,
 		AdminID:          b.ID,
 	}
 	if err := g.QueryGoodsExistNameByAdminId(); err == nil {
@@ -455,7 +464,7 @@ func UpdateGoods(token string, id int64, req entity.GoodsRequest) (res entity.Re
 	gt := businessModel.GoodsType{}
 	gt.ID = req.GoodsTypeID
 	if err := gt.QueryGoodsTypeByID(); err != nil {
-		res.Message = "添加失败，不存在该商品种类"
+		res.Message = "修改失败，不存在该商品种类"
 		return
 	}
 	g := businessModel.Goods{
@@ -473,6 +482,7 @@ func UpdateGoods(token string, id int64, req entity.GoodsRequest) (res entity.Re
 		"goods_type_id":     req.GoodsTypeID,
 	}
 	if err := g.QueryGoodsExistNameByAdminId(); err != nil {
+		g.ID = id
 		if err := g.UpdateGoodsByID(args); err != nil {
 			res.Message = "修改失败"
 			return
@@ -495,12 +505,19 @@ func UpdateGoods(token string, id int64, req entity.GoodsRequest) (res entity.Re
 }
 
 // 删除商品
-func DeleteGoods(ids []int64) (res entity.ResponseData) {
+func DeleteGoods(token string, ids []int64) (res entity.ResponseData) {
 	if len(ids) == 0 {
 		res.Message = "id 不能为空"
 		return
 	}
-	g := businessModel.Goods{}
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	g := businessModel.Goods{
+		AdminID: b.ID,
+	}
 	if err := g.DeleteGoodsByIds(ids); err != nil {
 		res.Message = "删除失败"
 		return
@@ -568,5 +585,270 @@ func DownOrUpGoods(id int64, downOrup bool) (res entity.ResponseData) {
 	}
 	res.Message = fmt.Sprintf("%v%v", message, "成功")
 	res.Status = true
+	return
+}
+
+// 添加餐桌种类
+func AddTableType(token string, req entity.TableTypeRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.Name == "" {
+		res.Message = "添加失败，名称不能为空"
+		return
+	}
+	t := businessModel.TableType{
+		Name:         req.Name,
+		SeatingMin:   req.SeatingMin,
+		SeatingMax:   req.SeatingMax,
+		DisplayOrNot: req.DisplayOrNot,
+		AdminID:      b.ID,
+	}
+	if err := t.QueryTableTypeExistName(); err == nil {
+		res.Message = "添加失败，已存在该餐桌种类名称"
+		return
+	}
+	if err := t.AddTableType(); err != nil {
+		res.Message = "添加失败"
+		return
+	}
+	res.Message = "添加成功"
+	res.Status = true
+	return
+}
+
+// 修改餐桌种类
+func UpdateTableType(token string, id int64, req entity.TableTypeRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.Name == "" {
+		res.Message = "添加失败，名称不能为空"
+		return
+	}
+	t := businessModel.TableType{
+		AdminID: b.ID,
+		Name:    req.Name,
+	}
+	args := map[string]interface{}{
+		"name":           req.Name,
+		"seating_min":    req.SeatingMin,
+		"seating_max":    req.SeatingMax,
+		"display_or_not": req.DisplayOrNot,
+		"admin_id":       b.ID,
+	}
+	if err := t.QueryTableTypeExistName(); err != nil {
+		t.ID = id
+		if err := t.UpdateTableType(args); err != nil {
+			res.Message = "添加失败"
+			return
+		}
+		res.Message = "修改成功"
+		res.Status = true
+		return
+	}
+	if t.ID != id {
+		res.Message = "修改失败，已存在该餐桌种类名称"
+		return
+	}
+	if err := t.UpdateTableType(args); err != nil {
+		res.Message = "修改失败"
+		return
+	}
+	res.Message = "修改成功"
+	res.Status = true
+	return
+}
+
+// 删除餐桌种类
+func DeleteTableType(token string, ids []int64) (res entity.ResponseData) {
+	if len(ids) == 0 {
+		res.Message = "id 不能为空"
+		return
+	}
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	var count int
+	for _, v := range ids {
+		t := businessModel.Table{
+			TableTypeID: v,
+		}
+		if arr := t.QueryTableByTableTypeID(); len(arr) > 0 {
+			count += len(arr)
+		}
+	}
+	if count > 0 {
+		res.Message = fmt.Sprintf("该餐桌种类下有%v个餐桌，无法删除改餐桌种类", count)
+		return
+	}
+	tt := businessModel.TableType{
+		AdminID: b.ID,
+	}
+	if err := tt.DeleteTableTypeByIDs(ids); err != nil {
+		res.Message = "删除失败"
+		return
+	}
+	res.Status = true
+	res.Message = "删除成功"
+	return
+}
+
+// 查询商家餐桌种类ID和名称
+func QueryTableTypeIDAndNameByAdminID(token string) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	t := businessModel.TableType{AdminID: b.ID}
+	if tableTypes := t.QueryTableTypeIDAndNameByAdminID(); len(tableTypes) == 0 {
+		res.Message = "查询失败，未找到餐桌种类信息"
+		return
+	} else {
+		res.Message = "查询成功"
+		res.Status = true
+		data := make(map[string]interface{})
+		data["tableType"] = tableTypes
+		res.Data = data
+		return
+	}
+}
+
+// 查询餐桌种类
+func QueryTableType(token string, pageSize int, page int) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	t := businessModel.TableType{AdminID: b.ID}
+	if ts := t.QueryTableTypesByAdminID(pageSize, page); len(ts) == 0 {
+		res.Message = "查询失败，未找到商品种类信息"
+		return
+	} else {
+		res.Message = "查询成功"
+		res.Status = true
+		data := make(map[string]interface{})
+		data["tableType"] = ts
+		res.Data = data
+		return
+	}
+}
+
+// 添加餐桌
+func AddTable(token string, req entity.TableRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.Name == "" {
+		res.Message = "添加失败，名称不能为空"
+		return
+	}
+	tt := businessModel.TableType{}
+	tt.ID = req.TableTypeID
+	if err := tt.QueryTableTypeByID(); err != nil {
+		res.Message = "添加失败，不存在该餐桌种类"
+		return
+	}
+	t := businessModel.Table{
+		AdminID:      b.ID,
+		Name:         req.Name,
+		Sort:         req.Sort,
+		DisplayOrNot: req.DisplayOrNot,
+		TableTypeID:  req.TableTypeID,
+	}
+	if err := t.QueryTableExistName(); err == nil {
+		res.Message = "添加失败，已存在该餐桌名称"
+		return
+	}
+	if err := t.AddTable(); err != nil {
+		res.Message = "添加失败"
+		return
+	}
+	res.Status = true
+	res.Message = "添加成功"
+	return
+}
+
+// 修改餐桌
+func UpdateTable(token string, id int64, req entity.TableRequest) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	if req.Name == "" {
+		res.Message = "添加失败，名称不能为空"
+		return
+	}
+	tt := businessModel.TableType{}
+	tt.ID = req.TableTypeID
+	if err := tt.QueryTableTypeByID(); err != nil {
+		res.Message = "修改失败，不存在该餐桌种类"
+		return
+	}
+	t := businessModel.Table{
+		AdminID: b.ID,
+		Name:    req.Name,
+	}
+	args := map[string]interface{}{
+		"name":            req.Name,
+		"sort":            req.Sort,
+		"display_or_not":  req.DisplayOrNot,
+		"table_type_id":   req.TableTypeID,
+		"table_type_name": tt.Name,
+	}
+	if err := t.QueryTableExistName(); err != nil {
+		t.ID = id
+		if err := t.UpdateTable(args); err != nil {
+			res.Message = "修改失败"
+			return
+		}
+		res.Message = "修改成功"
+		res.Status = true
+		return
+	}
+	if id != t.ID {
+		res.Message = "修改失败，已存在该餐桌名称"
+		return
+	}
+	if err := t.UpdateTable(args); err != nil {
+		res.Message = "修改失败"
+		return
+	}
+	res.Message = "修改成功"
+	res.Status = true
+	return
+}
+
+// 删除餐桌
+func DeleteTable(token string, ids []int64) (res entity.ResponseData) {
+	if len(ids) == 0 {
+		res.Message = "id 不能为空"
+		return
+	}
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	t := businessModel.Table{
+		AdminID: b.ID,
+	}
+	if err := t.DeleteTable(ids); err != nil {
+		res.Message = "删除失败"
+		return
+	}
+	res.Status = true
+	res.Message = "删除成功"
 	return
 }
