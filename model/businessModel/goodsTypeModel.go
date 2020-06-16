@@ -30,7 +30,7 @@ func (g *GoodsType) UpdateGoodsTypeByID(args map[string]interface{}) error {
 // 查询商品种类
 func (g *GoodsType) QueryGoodsTypeByID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ?", g.ID).First(&g).Error
+	return db.First(&g).Error
 }
 
 // 删除商品种类

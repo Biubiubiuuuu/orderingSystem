@@ -42,7 +42,7 @@ func (g *Goods) QueryGoodsByGoodsTypeID() (goods []Goods) {
 // 查询商品by id
 func (g *Goods) QueryGoodsByID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ?", g.ID).First(&g).Error
+	return db.First(&g).Error
 }
 
 // 删除商品

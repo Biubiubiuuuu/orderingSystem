@@ -14,7 +14,7 @@ type Table struct {
 	Opening       bool   `json:"opening"`               // 是否开台
 	DisplayOrNot  bool   `json:"display_or_not"`        // 是否显示
 	TableTypeID   int64  `json:"table_type_id"`         // 餐桌种类ID
-	TableTypeName int64  `json:"table_type_name"`       // 餐桌种类名称
+	TableTypeName string `json:"table_type_name"`       // 餐桌种类名称
 	AdminID       int64  `gorm:"INDEX" json:"admin_id"` // 商家管理员ID
 }
 
@@ -33,7 +33,7 @@ func (t *Table) UpdateTable(args map[string]interface{}) error {
 // 查询餐桌 By ID
 func (t *Table) QueryTableByID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ?", t.ID).First(&t).Error
+	return db.First(&t).Error
 }
 
 // 查询餐桌 By TableTypeID

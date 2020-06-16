@@ -128,6 +128,7 @@ func InitBusiness(router *gin.Engine) {
 	{
 		apiTT.POST("", businessController.AddTableType)
 		apiTT.GET("", businessController.QueryTableType)
+		apiTT.GET(":id", businessController.QueryTableTypeByID)
 		apiTT.PUT(":id", businessController.UpdateTableType)
 		apiTT.DELETE(":id", businessController.DeleteTableType)
 	}
@@ -136,5 +137,16 @@ func InitBusiness(router *gin.Engine) {
 	apiTTS.Use(jwtMiddleware.JWT())
 	{
 		apiTTS.GET("", businessController.QueryTableTypeIDAndName)
+	}
+	// 餐桌
+	apiTA := router.Group("/api/v1/business/table")
+	apiTA.Use(jwtMiddleware.JWT())
+	{
+		apiTA.POST("", businessController.AddTable)
+		apiTA.PUT(":id", businessController.UpdateTable)
+		apiTA.GET(":id", businessController.QueryTableByID)
+		apiTA.GET("", businessController.QueryTable)
+		apiTA.GET(":id/qrcode", businessController.GetTableqrcode)
+		apiTA.DELETE(":id", businessController.DeleteTable)
 	}
 }

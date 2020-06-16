@@ -1,3 +1,4 @@
+basePath: '{{.BasePath}}'
 definitions:
   entity.BusinessLoginOrRegisterRequest:
     properties:
@@ -32,7 +33,6 @@ definitions:
   entity.ResponseData:
     properties:
       data:
-        additionalProperties: true
         description: 返回数据
         type: object
       message:
@@ -60,6 +60,21 @@ definitions:
         description: 旧密码
         type: string
     type: object
+  entity.TableRequest:
+    properties:
+      display_or_not:
+        description: 是否显示
+        type: boolean
+      name:
+        description: 餐桌名称
+        type: string
+      sort:
+        description: 餐桌排序
+        type: integer
+      table_type_id:
+        description: 餐桌种类ID
+        type: integer
+    type: object
   entity.TableTypeRequest:
     properties:
       display_or_not:
@@ -75,9 +90,13 @@ definitions:
         description: 最少可坐人数
         type: integer
     type: object
+host: '{{.Host}}'
 info:
   contact: {}
+  description: '{{.Description}}'
   license: {}
+  title: '{{.Title}}'
+  version: '{{.Version}}'
 paths:
   /api/v1/admin/admins/{ids}:
     post:
@@ -96,6 +115,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 批量删除管理员
@@ -112,6 +132,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.BusinessLoginOrRegisterRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -119,6 +140,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       summary: 商家手机验证码登录
       tags:
       - 商家
@@ -142,6 +164,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 分页查询商家商品
@@ -193,6 +216,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 添加商品
@@ -215,6 +239,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 商品删除
@@ -236,6 +261,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 查询商品By ID
@@ -292,6 +318,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 修改商品
@@ -318,6 +345,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 上架/下架商品
@@ -343,6 +371,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 分页查询商家商品种类
@@ -358,6 +387,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.GoodsTypeRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -365,6 +395,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 商品种类添加
@@ -387,6 +418,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 商品种类删除
@@ -408,6 +440,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 查询商品种类By ID
@@ -428,6 +461,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.GoodsTypeRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -435,6 +469,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 商品种类修改
@@ -451,6 +486,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 查询商家商品种类ID和名称
@@ -467,6 +503,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.BusinessPassLoginRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -474,6 +511,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       summary: 商家账号密码登录
       tags:
       - 商家
@@ -488,6 +526,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.BusinessLoginOrRegisterRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -495,6 +534,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       summary: 商家注册
       tags:
       - 商家
@@ -509,6 +549,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 查询商家门店信息
@@ -565,9 +606,157 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 更新商家门店信息
+      tags:
+      - 商家
+  /api/v1/business/table:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页大小
+        in: query
+        name: pageSize
+        type: string
+      - description: 页数
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 分页查询餐桌
+      tags:
+      - 商家
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TableRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 添加餐桌
+      tags:
+      - 商家
+  /api/v1/business/table/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 餐桌ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 删除餐桌
+      tags:
+      - 商家
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 餐桌ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询餐桌By ID
+      tags:
+      - 商家
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 餐桌ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TableRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改餐桌
+      tags:
+      - 商家
+  /api/v1/business/table/{id}/qrcode:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 餐桌ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 生成餐桌二维码
       tags:
       - 商家
   /api/v1/business/tabletype:
@@ -590,9 +779,10 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
-      summary: 分页查询餐桌
+      summary: 分页查询餐桌种类
       tags:
       - 商家
     post:
@@ -605,6 +795,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.TableTypeRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -612,6 +803,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 添加餐桌种类
@@ -634,9 +826,32 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 删除餐桌种类
+      tags:
+      - 商家
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 餐桌种类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            $ref: '#/definitions/entity.ResponseData'
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 查询餐桌种类By ID
       tags:
       - 商家
     put:
@@ -654,6 +869,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.TableTypeRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -661,6 +877,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 修改餐桌种类
@@ -677,6 +894,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 查询餐桌种类ID和名称
@@ -699,6 +917,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       summary: 获取验证码
       tags:
       - 公共接口
@@ -713,6 +932,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 查询管理员by token
@@ -755,6 +975,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 添加管理员
@@ -788,6 +1009,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 修改管理员
@@ -810,6 +1032,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 删除管理员
@@ -831,6 +1054,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 查询管理员by id
@@ -858,6 +1082,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 启用/禁用管理员
@@ -885,6 +1110,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 授权/禁止管理员权限
@@ -901,6 +1127,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.SystemAdminUpdatePassRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -908,6 +1135,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 修改管理员密码
@@ -957,6 +1185,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       security:
       - ApiKeyAuth: []
       summary: 分页查询管理员(默认前100条) 并返回总记录数
@@ -973,6 +1202,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/entity.SystemAdminLoginRequest'
+          type: object
       produces:
       - application/json
       responses:
@@ -980,6 +1210,7 @@ paths:
           description: desc
           schema:
             $ref: '#/definitions/entity.ResponseData'
+            type: object
       summary: 管理员登录
       tags:
       - 系统管理员

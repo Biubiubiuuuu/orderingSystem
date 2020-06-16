@@ -1,9 +1,14 @@
 {
     "swagger": "2.0",
     "info": {
+        "description": "{{.Description}}",
+        "title": "{{.Title}}",
         "contact": {},
-        "license": {}
+        "license": {},
+        "version": "{{.Version}}"
     },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
     "paths": {
         "/api/v1/admin/admins/{ids}": {
             "post": {
@@ -35,6 +40,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -60,6 +66,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.BusinessLoginOrRegisterRequest"
                         }
                     }
@@ -68,6 +75,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -109,6 +117,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -187,6 +196,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -223,6 +233,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -308,6 +319,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -342,6 +354,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -384,6 +397,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -425,6 +439,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -453,6 +468,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.GoodsTypeRequest"
                         }
                     }
@@ -461,6 +477,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -497,6 +514,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -532,6 +550,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.GoodsTypeRequest"
                         }
                     }
@@ -540,6 +559,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -574,6 +594,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -601,6 +622,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -626,6 +648,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.BusinessPassLoginRequest"
                         }
                     }
@@ -634,6 +657,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -659,6 +683,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.BusinessLoginOrRegisterRequest"
                         }
                     }
@@ -667,6 +692,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -694,6 +720,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -779,13 +806,14 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
                 }
             }
         },
-        "/api/v1/business/tabletype": {
+        "/api/v1/business/table": {
             "get": {
                 "security": [
                     {
@@ -820,6 +848,241 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "添加餐桌",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.TableRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/business/table/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "查询餐桌By ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "餐桌ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "修改餐桌",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "餐桌ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.TableRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "删除餐桌",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "餐桌ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/business/table/{id}/qrcode": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "生成餐桌二维码",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "餐桌ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/business/tabletype": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "分页查询餐桌种类",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "页大小",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "页数",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -848,6 +1111,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.TableTypeRequest"
                         }
                     }
@@ -856,6 +1120,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -863,6 +1128,41 @@
             }
         },
         "/api/v1/business/tabletype/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "商家"
+                ],
+                "summary": "查询餐桌种类By ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "餐桌种类ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "desc",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/entity.ResponseData"
+                        }
+                    }
+                }
+            },
             "put": {
                 "security": [
                     {
@@ -893,6 +1193,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.TableTypeRequest"
                         }
                     }
@@ -901,6 +1202,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -935,6 +1237,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -962,6 +1265,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -993,6 +1297,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1020,6 +1325,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1072,6 +1378,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1137,6 +1444,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1180,6 +1488,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1223,6 +1532,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1253,6 +1563,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.SystemAdminUpdatePassRequest"
                         }
                     }
@@ -1261,6 +1572,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1297,6 +1609,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1331,6 +1644,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1408,6 +1722,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1433,6 +1748,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.SystemAdminLoginRequest"
                         }
                     }
@@ -1441,6 +1757,7 @@
                     "200": {
                         "description": "desc",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/entity.ResponseData"
                         }
                     }
@@ -1497,8 +1814,7 @@
             "properties": {
                 "data": {
                     "description": "返回数据",
-                    "type": "object",
-                    "additionalProperties": true
+                    "type": "object"
                 },
                 "message": {
                     "description": "提示信息",
@@ -1533,6 +1849,27 @@
                 "old_password": {
                     "description": "旧密码",
                     "type": "string"
+                }
+            }
+        },
+        "entity.TableRequest": {
+            "type": "object",
+            "properties": {
+                "display_or_not": {
+                    "description": "是否显示",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "餐桌名称",
+                    "type": "string"
+                },
+                "sort": {
+                    "description": "餐桌排序",
+                    "type": "integer"
+                },
+                "table_type_id": {
+                    "description": "餐桌种类ID",
+                    "type": "integer"
                 }
             }
         },

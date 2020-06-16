@@ -31,7 +31,7 @@ func (t *TableType) UpdateTableType(args map[string]interface{}) error {
 // 查询餐桌种类 by id
 func (t *TableType) QueryTableTypeByID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ?", t.ID).First(&t).Error
+	return db.First(&t).Error
 }
 
 // 删除餐桌种类(可批量)

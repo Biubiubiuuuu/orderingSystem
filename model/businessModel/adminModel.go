@@ -40,7 +40,7 @@ func (a *BusinessAdmin) RegisterBusinessAdmin() error {
 //  return BusinessAdmin,error
 func (a *BusinessAdmin) QueryUserByID() error {
 	db := mysql.GetMysqlDB()
-	return db.Where("id = ? ", a.ID).First(&a).Error
+	return db.First(&a).Error
 }
 
 // 查询商家 by tel

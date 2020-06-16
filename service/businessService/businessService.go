@@ -2,7 +2,11 @@ package businessService
 
 import (
 	"fmt"
+	"net/url"
 	"time"
+
+	"github.com/Biubiubiuuuu/orderingSystem/helper/configHelper"
+	"github.com/Biubiubiuuuu/orderingSystem/helper/fileHelper"
 
 	"github.com/Biubiubiuuuu/orderingSystem/entity"
 	"github.com/Biubiubiuuuu/orderingSystem/helper/encryptHelper"
@@ -11,6 +15,7 @@ import (
 	"github.com/Biubiubiuuuu/orderingSystem/model/businessModel"
 	"github.com/Biubiubiuuuu/orderingSystem/model/commonModel"
 	"github.com/google/uuid"
+	"github.com/skip2/go-qrcode"
 )
 
 // 商家注册
@@ -278,6 +283,10 @@ func UpdateGoodsType(token string, id int64, req entity.GoodsTypeRequest) (res e
 		res.Message = "添加失败，token错误，未找到用户信息"
 		return
 	}
+	if id == 0 {
+		res.Message = "商品种类ID不能为0"
+		return
+	}
 	if req.Name == "" {
 		res.Message = "商品种类名称不能为空"
 		return
@@ -293,6 +302,10 @@ func UpdateGoodsType(token string, id int64, req entity.GoodsTypeRequest) (res e
 	}
 	if err := g.QueryGoodsTypeExistNameByAdminID(); err != nil {
 		g.ID = id
+		if err := g.QueryGoodsTypeByID(); err != nil {
+			res.Message = "修改失败，不存在该商品种类"
+			return
+		}
 		if err := g.UpdateGoodsTypeByID(args); err != nil {
 			res.Message = "修改失败"
 			return
@@ -457,6 +470,10 @@ func UpdateGoods(token string, id int64, req entity.GoodsRequest) (res entity.Re
 		res.Message = "添加失败，token错误，未找到用户信息"
 		return
 	}
+	if id == 0 {
+		res.Message = "商品ID不能为0"
+		return
+	}
 	if req.GoodsName == "" {
 		res.Message = "商品名称不能为空"
 		return
@@ -483,6 +500,10 @@ func UpdateGoods(token string, id int64, req entity.GoodsRequest) (res entity.Re
 	}
 	if err := g.QueryGoodsExistNameByAdminId(); err != nil {
 		g.ID = id
+		if err := g.QueryGoodsByID(); err != nil {
+			res.Message = "修改失败，不存在该商品"
+			return
+		}
 		if err := g.UpdateGoodsByID(args); err != nil {
 			res.Message = "修改失败"
 			return
@@ -643,6 +664,10 @@ func UpdateTableType(token string, id int64, req entity.TableTypeRequest) (res e
 	}
 	if err := t.QueryTableTypeExistName(); err != nil {
 		t.ID = id
+		if err := t.QueryTableTypeByID(); err != nil {
+			res.Message = "修改失败，不存在该餐桌种类"
+			return
+		}
 		if err := t.UpdateTableType(args); err != nil {
 			res.Message = "添加失败"
 			return
@@ -721,6 +746,22 @@ func QueryTableTypeIDAndNameByAdminID(token string) (res entity.ResponseData) {
 	}
 }
 
+// 查询餐桌种类By ID
+func QueryTableTypeByID(id int64) (res entity.ResponseData) {
+	t := businessModel.TableType{}
+	t.ID = id
+	if err := t.QueryTableTypeByID(); err != nil {
+		res.Message = "查询失败，未找到餐桌种类信息"
+		return
+	}
+	res.Message = "查询成功"
+	res.Status = true
+	data := make(map[string]interface{})
+	data["tableType"] = t
+	res.Data = data
+	return
+}
+
 // 查询餐桌种类
 func QueryTableType(token string, pageSize int, page int) (res entity.ResponseData) {
 	b := businessModel.BusinessAdmin{Token: token}
@@ -760,11 +801,12 @@ func AddTable(token string, req entity.TableRequest) (res entity.ResponseData) {
 		return
 	}
 	t := businessModel.Table{
-		AdminID:      b.ID,
-		Name:         req.Name,
-		Sort:         req.Sort,
-		DisplayOrNot: req.DisplayOrNot,
-		TableTypeID:  req.TableTypeID,
+		AdminID:       b.ID,
+		Name:          req.Name,
+		Sort:          req.Sort,
+		DisplayOrNot:  req.DisplayOrNot,
+		TableTypeID:   req.TableTypeID,
+		TableTypeName: tt.Name,
 	}
 	if err := t.QueryTableExistName(); err == nil {
 		res.Message = "添加失败，已存在该餐桌名称"
@@ -809,6 +851,10 @@ func UpdateTable(token string, id int64, req entity.TableRequest) (res entity.Re
 	}
 	if err := t.QueryTableExistName(); err != nil {
 		t.ID = id
+		if err := t.QueryTableByID(); err != nil {
+			res.Message = "修改失败，不存在该餐桌"
+			return
+		}
 		if err := t.UpdateTable(args); err != nil {
 			res.Message = "修改失败"
 			return
@@ -850,5 +896,82 @@ func DeleteTable(token string, ids []int64) (res entity.ResponseData) {
 	}
 	res.Status = true
 	res.Message = "删除成功"
+	return
+}
+
+// 查询餐桌By ID
+func QueryTableByID(id int64) (res entity.ResponseData) {
+	t := businessModel.Table{}
+	t.ID = id
+	if err := t.QueryTableByID(); err != nil {
+		res.Message = "查询失败，未找到餐桌信息"
+		return
+	}
+	res.Message = "查询成功"
+	res.Status = true
+	data := make(map[string]interface{})
+	data["table"] = t
+	res.Data = data
+	return
+}
+
+// 查询餐桌
+func QueryTable(token string, pageSize int, page int) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	t := businessModel.Table{AdminID: b.ID}
+	if ts := t.QueryTablesByAdminID(pageSize, page); len(ts) == 0 {
+		res.Message = "查询失败，未找到商品信息"
+		return
+	} else {
+		res.Message = "查询成功"
+		res.Status = true
+		data := make(map[string]interface{})
+		data["table"] = ts
+		res.Data = data
+		return
+	}
+}
+
+// 生成餐桌二维码
+func SettingTableqrcode(token string, host string, id int64) (res entity.ResponseData) {
+	b := businessModel.BusinessAdmin{Token: token}
+	if err := b.QueryUserByToken(); err != nil {
+		res.Message = "添加失败，token错误，未找到用户信息"
+		return
+	}
+	t := businessModel.Table{}
+	t.ID = id
+	if err := t.QueryTableByID(); err != nil {
+		res.Message = "查询失败，未找到餐桌信息"
+		return
+	}
+	// 二维码名 避免重复取uuid
+	uuid, _ := uuid.NewUUID()
+	pathFile := configHelper.ImageDir
+	if !fileHelper.IsExist(pathFile) {
+		fileHelper.CreateDir(pathFile)
+	}
+	//访问路径
+	qr_code := fmt.Sprintf("%s/%s%s.png", host, pathFile, uuid)
+	//保存绝对路径
+	pathFile = fmt.Sprintf("%s%s.png", pathFile, uuid)
+	content := fmt.Sprintf("%s?tabletypename=%s&table=%s", host, url.QueryEscape(t.TableTypeName), url.QueryEscape(t.Name))
+	if err := qrcode.WriteFile(content, qrcode.Medium, 256, pathFile); err != nil {
+		res.Message = fmt.Sprintf("二维码生成失败%s", err)
+		return
+	}
+	args := map[string]interface{}{
+		"qr_code": qr_code,
+	}
+	if err := t.UpdateTable(args); err != nil {
+		res.Message = "二维码生成失败"
+		return
+	}
+	res.Status = true
+	res.Message = "二维码生成成功"
 	return
 }
